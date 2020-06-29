@@ -1,71 +1,57 @@
 package main
 
-import "fmt"
-import "log"
-import "io"
-import "github.com/jacobsa/go-serial/serial"
-//import "github.com/davecgh/go-spew/spew"
+import (
+	"fmt"
+	"github.com/bartlettc22/wx200/pkg/wx200"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
+	// "sync"
+	"time"
+)
+
+//
+var wx *wx200.WX200
+
+// MetricsHandler is our http request handler
+type MetricsHandler struct{}
 
 func main() {
-    // Set up options.
-    options := serial.OpenOptions{
-      PortName: "/dev/ttyUSB0",
-      BaudRate: 9600,
-      DataBits: 8,
-      StopBits: 1,
-      MinimumReadSize: 4,
-    }
 
-    // Open the port.
-    port, err := serial.Open(options)
-    if err != nil {
-      log.Fatalf("serial.Open: %v", err)
-    }
+	// var startupWG sync.WaitGroup
+	// startupWG.Add(1)
+	listenPort := 9041
 
-    // Make sure to close it later.
-    defer port.Close()
+	// Begin reading in WX200 data
+	wx = wx200.New(&wx200.Config{
+		ComPortName: "/dev/ttyUSB0",
+		// StartupWG:   startupWG,
+	})
+	go wx.Go()
 
-
-    // Read in first byte to determine header
-
-    b := make([]byte, 1)
-    for {
-	_, err := port.Read(b)
-	//fmt.Printf("n = %v err = %v b = %v\n", n, err, b)
-//	fmt.Printf("b[:n] = %q\n", b[:n])
-	if err == io.EOF {
-		break
+	// Wait until we've got data before serving
+	// This avoids publishing zeros to Prometheus and potentially messing up data on restarts
+	fmt.Println("Waiting for all data to come in before starting metrics server...")
+	for {
+		if !wx.Humidity.LastDataRecieved.IsZero() {
+			break
+		}
+		time.Sleep(1 * time.Second)
 	}
 
-	switch b[0] {
-	case '\x8f':
-		fmt.Println("Recieved Time/Humidity data...")
-	case '\x9f':
-		fmt.Println("Recieved Temperature data...")
-	case '\xaf':
-		fmt.Println("Recieved Barometer/Dew Point data...")
-	case '\xbf':
-		fmt.Println("Recieved Rain data...")
-	case '\xcf':
-		fmt.Println("Recieved Wind/Wind Chill/General data...")
-	default:
-		//fmt.Println("Recieved Unknown data...")
-	}
-	 // c := make([]byte, 34)
-	 // m, err := port.Read(c)
-	 // if err != nil {
-         //   fmt.Errorf("%v", err)
-	 // }
-	 // spew.Dump(c[:m])
-	//}
+	var metricsHandler MetricsHandler
+	http.Handle("/metrics", metricsHandler)
+	fmt.Printf("Listening on port %d\n", listenPort)
+	http.ListenAndServe(fmt.Sprintf(":%d", listenPort), nil)
+}
 
-    }
-    // Write 4 bytes to the port.
-    // b := []byte{0x00, 0x01, 0x02, 0x03}
-    //n, err := port.Write(b)
-    //if err != nil {
-    //  log.Fatalf("port.Write: %v", err)
-    //}
+// ServeHTTP gets the latest WX200 serial data and serves up the Prometheus metrics
+func (m MetricsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-    //fmt.Println("Wrote", n, "bytes.")
+	// Set our metrics
+	metricHumidity.With(prometheus.Labels{"location": "indoor"}).Set(float64(wx.Humidity.Indoor) / 100)
+
+	// Let promhttp serve up the metrics page
+	promHandler := promhttp.Handler()
+	promHandler.ServeHTTP(w, r)
 }
