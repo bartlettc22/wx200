@@ -12,6 +12,9 @@ import (
 	"time"
 )
 
+// Application version - passed in via build
+var version = "default"
+
 var wx *wx200.WX200
 var errorChan chan error
 var windDataChan chan wx200.Wind
@@ -28,6 +31,7 @@ func init() {
 func main() {
 
 	log.SetLevel(log.DebugLevel)
+	log.Infof("Starting WX200 exporter v%s", version)
 
 	// CMD VARS
 	listenPort := 9041
@@ -131,6 +135,6 @@ func collectInfoMetrics() {
 
 func watchErrors() {
 	for err := range errorChan {
-		log.Warnf("%v\n", err)
+		log.Warnf("%v", err)
 	}
 }

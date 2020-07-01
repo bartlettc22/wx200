@@ -1,0 +1,9 @@
+arch:
+  - amd64
+  - arm64
+os: linux
+language: minimal
+services:
+  - docker
+script:
+  - scripts/build.sh ${TRAVIS_BRANCH} linux

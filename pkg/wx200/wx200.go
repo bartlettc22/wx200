@@ -6,7 +6,7 @@ import (
 	"github.com/jacobsa/go-serial/serial"
 	"io"
 	"log"
-	// "time"
+	"time"
 )
 
 const (
@@ -68,16 +68,14 @@ func (w *WX200) Go() {
 		MinimumReadSize: 4,
 	}
 
-	// Open the port.
-	w.comPort, err = serial.Open(serialOptions)
-	if err != nil {
-		w.config.ErrorChan <- err
-	}
-
-	// Make sure to close it later.
-	defer w.comPort.Close()
-
+	reconnect := false
 	headerByte := make([]byte, 1)
+
+	// Open the port.
+	// w.comPort, err = serial.Open(serialOptions)
+	// if err != nil {
+	// 	w.config.ErrorChan <- err
+	// }
 
 	// main loop for reading serial data
 	// Time/Humidity 10 seconds
@@ -87,10 +85,24 @@ func (w *WX200) Go() {
 	// Wind/General 5 seconds
 	for {
 
+		// Connect to serial port if not already connected
+		if w.comPort == nil || reconnect == true {
+			w.comPort, err = serial.Open(serialOptions)
+			if err != nil {
+				w.error(fmt.Errorf("Error opening serial communication to WX200: %v. Retrying...", err))
+				time.Sleep(5 * time.Second)
+				continue
+			} else {
+				defer w.comPort.Close()
+				reconnect = false
+			}
+		}
+
 		// Read in first byte to determine header
 		_, err := w.comPort.Read(headerByte)
 		if err != nil {
-			w.error(errors.New(fmt.Sprintf("Error reading serial data from %s", w.config.ComPortName)))
+			w.error(errors.New(fmt.Sprintf("Error reading serial data: %v. Reconnecting...", err)))
+			reconnect = true
 			continue
 		}
 
