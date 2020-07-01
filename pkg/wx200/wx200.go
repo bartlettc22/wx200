@@ -71,12 +71,6 @@ func (w *WX200) Go() {
 	reconnect := false
 	headerByte := make([]byte, 1)
 
-	// Open the port.
-	// w.comPort, err = serial.Open(serialOptions)
-	// if err != nil {
-	// 	w.config.ErrorChan <- err
-	// }
-
 	// main loop for reading serial data
 	// Time/Humidity 10 seconds
 	// Temperature 10 seconds
@@ -109,21 +103,14 @@ func (w *WX200) Go() {
 		switch headerByte[0] {
 		case HEADER_TIME_HUMIDITY:
 			err = w.ReadTimeHumidity()
-			// w.info.SamplesRecieved = w.info.SamplesRecieved + 1
 		case HEADER_TEMPERATURE:
 			err = w.readTemperature()
-			// fmt.Println("Recieved Temperature data...")
-			// w.info.SamplesRecieved = w.info.SamplesRecieved + 1
 		case HEADER_BARO_DEW:
 			err = w.readBaroDew()
-			// fmt.Println("Recieved Barometer/Dew Point data...")
-			// w.info.SamplesRecieved = w.info.SamplesRecieved + 1
 		case HEADER_RAIN:
 			err = w.readRain()
-			// w.info.SamplesRecieved = w.info.SamplesRecieved + 1
 		case HEADER_WIND_GENERAL:
 			err = w.readWindGeneral()
-			// w.info.SamplesRecieved = w.info.SamplesRecieved + 1
 		default:
 			// err = errors.New(fmt.Sprintf("Recieved unknown serial data header x%02x...", headerByte[0]))
 		}

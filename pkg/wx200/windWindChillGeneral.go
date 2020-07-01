@@ -1,7 +1,6 @@
 package wx200
 
 import (
-	// "errors"
 	"time"
 )
 
@@ -57,10 +56,10 @@ const (
 )
 
 const (
-	WIND_FORMAT_MPH = iota
-	WIND_FORMAT_KNOTS
-	WIND_FORMAT_MS
-	WIND_FORMAT_KPH
+	WIND_UNITS_MPH = iota
+	WIND_UNITS_KNOTS
+	WIND_UNITS_MS
+	WIND_UNITS_KPH
 )
 
 type Wind struct {
@@ -134,19 +133,6 @@ func (w *WX200) readWindGeneral() error {
 	if err != nil {
 		return err
 	}
-	// err := readSerial(w.comPort, w.bufWindGeneral)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// // Validate checksum
-	// checksumValid := validateChecksum(HEADER_WIND_GENERAL, w.bufWindGeneral)
-	// if !checksumValid {
-	// 	return errors.New("Checksum failed on group 'Wind/General'")
-	// }
-
-	// // Split buffer up into 4-bit chunks to make it easier to work with
-	// buf := chopBuffer(w.bufWindGeneral)
 
 	// General
 	general := General{}
@@ -203,7 +189,7 @@ func (w *WX200) readWindGeneral() error {
 	if isBitSet(buf[23][1], 3) {
 		chillAlarmSign = -1
 	}
-	// Output is in F for some reason so we convert to C
+	// Wind chill alarm data is in F for some reason so we convert to C
 	chillAlarmF := (int16(chillAlarmThreshholdMultiplier)*100 + int16(combineDecimal(buf[22]))) * chillAlarmSign
 	chill.ChillAlarmThreshhold = int16(float32(chillAlarmF-32.0) * (float32(5) / float32(9)))
 	chill.ChillAlarmSet = isBitSet(buf[25][1], 1)

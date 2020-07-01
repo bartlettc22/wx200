@@ -21,6 +21,8 @@ var windDataChan chan wx200.Wind
 var windChillDataChan chan wx200.WindChill
 var humidityDataChan chan wx200.Humidity
 var rainDataChan chan wx200.Rain
+var barometerDataChan chan wx200.Barometer
+var dewPointDataChan chan wx200.DewPoint
 var infoDataChan chan wx200.Info
 
 func init() {
@@ -41,6 +43,8 @@ func main() {
 	windDataChan = make(chan wx200.Wind, 1)
 	windChillDataChan = make(chan wx200.WindChill, 1)
 	humidityDataChan = make(chan wx200.Humidity, 1)
+	barometerDataChan = make(chan wx200.Barometer, 1)
+	dewPointDataChan = make(chan wx200.DewPoint, 1)
 	infoDataChan = make(chan wx200.Info, 1)
 	errorChan = make(chan error)
 
@@ -50,6 +54,8 @@ func main() {
 		WindChillDataChan: windChillDataChan,
 		HumidityDataChan:  humidityDataChan,
 		RainDataChan:      rainDataChan,
+		BarometerDataChan: barometerDataChan,
+		DewPointDataChan:  dewPointDataChan,
 		ErrorChan:         errorChan,
 		InfoDataChan:      infoDataChan,
 	})
@@ -59,6 +65,8 @@ func main() {
 	go collectWindMetrics()
 	go collectWindChillMetrics()
 	go collectHumidityMetrics()
+	go collectBarometerMetrics()
+	go collectDewPointMetrics()
 	go collectInfoMetrics()
 
 	// Start serial communication
@@ -118,6 +126,32 @@ func collectRainMetrics() {
 		log.WithFields(log.Fields{
 			"rain": fmt.Sprintf("%+v", r),
 		}).Debug("Rain data received")
+		// spew.Dump(r)
+		// metricGustSpeed.With(prometheus.Labels{}).Set(w.GustSpeed)
+		// metricGustDir.With(prometheus.Labels{}).Set(float64(w.GustDirection))
+		// metricAvgWindSpeed.With(prometheus.Labels{}).Set(w.AvgSpeed)
+		// metricAvgWindDir.With(prometheus.Labels{}).Set(float64(w.AvgDirection))
+	}
+}
+
+func collectBarometerMetrics() {
+	for b := range barometerDataChan {
+		log.WithFields(log.Fields{
+			"rain": fmt.Sprintf("%+v", b),
+		}).Debug("Barometer data received")
+		// spew.Dump(r)
+		// metricGustSpeed.With(prometheus.Labels{}).Set(w.GustSpeed)
+		// metricGustDir.With(prometheus.Labels{}).Set(float64(w.GustDirection))
+		// metricAvgWindSpeed.With(prometheus.Labels{}).Set(w.AvgSpeed)
+		// metricAvgWindDir.With(prometheus.Labels{}).Set(float64(w.AvgDirection))
+	}
+}
+
+func collectDewPointMetrics() {
+	for d := range dewPointDataChan {
+		log.WithFields(log.Fields{
+			"dewpoint": fmt.Sprintf("%+v", d),
+		}).Debug("Dew Point data received")
 		// spew.Dump(r)
 		// metricGustSpeed.With(prometheus.Labels{}).Set(w.GustSpeed)
 		// metricGustDir.With(prometheus.Labels{}).Set(float64(w.GustDirection))

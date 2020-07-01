@@ -1,0 +1,291 @@
+Protocol of Radio Shack WX200 Electronic Weather Sataion
+
+Revision: 8/18/1999
+
+Blank entries indicate undefined or unknown data.
+
+This information may be freely distributed.
+									
+Byte	Nibble	Bit(s)	Datum	Description 'part' of lo<format<hi unit @ resoltion
+									
+8F. 0	HH	all	Group	8F ----------------------------------------
+8F. 1	DD	all	Time	Second 0<ab<59 @ 1
+8F. 2	DD	all	Time	Minute 0<ab<59 @ 1
+8F. 3	DD	all	Time	Hour   0<ab<23 @ 1
+8F. 4	DD	all	Time	Day    1<ab<31 @ 1
+8F. 5	Bx	0	Time	Format: 0=12 Hour,  1=24 Hour	
+8F. 5	Bx	1	Time	Format: 0=Day-Month, 1=Month-Day	
+8F. 5	Bx	2,3
+8F. 5	xH	all	Time	Month: 1=Jan, 2=Feb, ... B=Nov, C=Dec
+8F. 6	DD	all	Time	Alarm: Minute
+8F. 7	DD	all	Time	Alarm: Hour
+8F. 8	DD	all	Humid	Indoor:    10<ab<97 % @ 1
+8F. 9	DD	all	Humid	Indoor Hi: <ab> %
+8F.10	DD	all	Humid	Indoor Hi: Minute
+8F.11	DD	all	Humid	Indoor Hi: Hour
+8F.12	DD	all	Humid	Indoor Hi: Day
+8F.13	Dx	all	Humid	Indoor Lo: 'b' <ab> %
+8F.13	xH	all	Humid	Indoor Hi: Month
+8F.14	Dx	all	Humid	Indoor Lo: Minute 'b' of <ab>	
+8F.14	xD	all	Humid	Indoor Lo: 'a' of <ab> %	
+8F.15	Dx	all	Humid	Indoor Lo: Hour   'b' of <ab>	
+8F.15	xD	all	Humid	Indoor Lo: Minute 'a' of <ab>
+8F.16	Dx	all	Humid	Indoor Lo: Day    'b' of <ab>
+8F.16	xD	all	Humid	Indoor Lo: Hour   'a' of <ab>
+8F.17	Hx	all	Humid	Indoor Lo: Month
+8F.17	xD	all	Humid	Indoor Lo: Day    'a' of <ab>
+8F.18	DD	all	Humid	Indoor Alarm Hi: <ab> %
+8F.19	DD	all	Humid	Indoor Alarm Lo: <ab> %
+8F.20	DD	all	Humid	Outdoor:    10<ab<97 % @ 1
+8F.21	DD	all	Humid	Outdoor Hi: <ab> %
+8F.22	DD	all	Humid	Outdoor Hi: Minute
+8F.23	DD	all	Humid	Outdoor Hi: Hour
+8F.24	DD	all	Humid	Outdoor Hi: Day
+8F.25	Dx	all	Humid	Outdoor Lo: 'b' of <ab> %
+8F.25	xH	all	Humid	Outdoor Hi: Month
+8F.26	Dx	all	Humid	Outdoor Lo: Minute 'b' of <ab>
+8F.26	xD	all	Humid	Outdoor Lo: 'a' of <ab> %
+8F.27	Dx	all	Humid	Outdoor Lo: Hour   'b' of <ab>
+8F.27	xD	all	Humid	Outdoor Lo: Minute 'a' of <ab>
+8F.28	Dx	all	Humid	Outdoor Lo: Day    'b' of <ab>
+8F.28	xD	all	Humid	Outdoor Lo: Hour   'a' of <ab>
+8F.29	Hx	all	Humid	Outdoor Lo: Month
+8F.29	xD	all	Humid	Outdoor Lo: Day    'a' of <ab>
+8F.30	DD	all	Humid	Outdoor Alarm Hi: <ab> %
+8F.31	DD	all	Humid	Outdoor Alarm Lo: <ab> %
+8F.32	Bx	0	Humid	Outdoor: O.R. (out of range) = 1
+8F.32	Bx	1
+8F.32	Bx	2	Humid	Indoor Hi: O.R. = 1
+8F.32	Bx	3	Humid	Indoor: O.R. = 1
+8F.32	xB	0-2
+8F.32	xB	3	Humid	Outdoor Hi: O.R. = 1
+8F.33	Bx	0,1	Humid	Humidity Outdoors Alarm Set when both bits = 1
+8F.33	Bx	2,3	Humid	Humidity Indoors Alarm Set when both bits = 1
+8F.33	xB	0-2
+8F.33	xB	3	Time	Alarm Set = 1
+8F.34	HH	all	Cksum	Unsigned sum of first 34 bytes
+9F. 0	HH	all	Group	9F ----------------------------------------
+9F. 1	DD	all	Temp	Indoor: 'bc' of 0<ab.c<50 degrees C @ 0.1
+9F. 2	Dx	all	Temp	Indoor Hi: 'c' of <ab.c> C
+9F. 2	xB	0-2	Temp	Indoor: 'a' of <ab.c> C
+9F. 2	xB	3	Temp	Indoor: Sign 0=+, 1=-
+9F. 3	BD	0-2,all	Temp	Indoor Hi: 'ab' of <ab.c> C
+9F. 3	Bx	3	Temp	Indoor Hi: Sign 0=+, 1=-
+9F. 4	DD	all	Temp	Indoor Hi: Minute
+9F. 5	DD	all	Temp	Indoor Hi: Hour
+9F. 6	DD	all	Temp	Indoor Hi: Day
+9F. 7	Dx	all	Temp	Indoor Lo: 'c' of <ab.c> C
+9F. 7	xH	all	Temp	Indoor Hi: Month
+9F. 8	BD	0-2,all	Temp	Indoor Lo: 'ab' of <ab.c> C
+9F. 8	Bx	3	Temp	Indoor Lo: Sign 0=+, 1=-
+9F. 9	DD	all	Temp	Indoor Lo: Minute
+9F.10	DD	all	Temp	Indoor Lo: Hour
+9F.11	DD	all	Temp	Indoor Lo: Day
+9F.12	Dx	all	Temp	Indoor Alarm Hi: 'c' of 32<abc<122 deg F @ 1
+9F.12	xH	all	Temp	Indoor Lo: Month
+9F.13	BD	0,all	Temp	Indoor Alarm Hi: 'ab' of <abc> F
+9F.13	Bx	1-3
+9F.14	DD	all	Temp	Indoor Alarm Lo: 'bc' of 32<abc<122 deg F @ 1
+9F.15	Bx	0,1
+9F.15	Bx	2	Temp	Format: 0=degrees C, 1=degrees F
+9F.15	Bx	3
+9F.15	xB	0	Temp	Indoor Alarm Lo: 'a' of <abc> F
+9F.15	xB	1-3
+9F.16	DD	all	Temp	Outdoor: 'bc' of -40<ab.c<60 degrees C @ 0.1
+9F.17	Dx	all	Temp	Outdoor Hi: 'c' of <ab.c> C
+9F.17	xB	0-2	Temp	Outdoor: 'a' of <ab.c> C
+9F.17	xB	3	Temp	Outdoor: Sign 0=+, 1=-
+9F.18	BD	0-2,all	Temp	Outdoor Hi: 'ab' of <ab.c> C
+9F.18	Bx	3	Temp	Outdoor Hi: Sign 0=+, 1=-
+9F.19	DD	all	Temp	Outdoor Hi: Minute
+9F.20	DD	all	Temp	Outdoor Hi: Hour
+9F.21	DD	all	Temp	Outdoor Hi: Day
+9F.22	Dx	all	Temp	Outdoor Lo: 'c' of <ab.c> C
+9F.22	xH	all	Temp	Outdoor Hi: Month
+9F.23	BD	0-2,all	Temp	Outdoor Lo: 'ab' of <ab.c> C
+9F.23	Bx	3	Temp	Outdoor Lo: Sign 0=+, 1=-
+9F.24	DD	all	Temp	Outdoor Lo: Minute
+9F.25	DD	all	Temp	Outdoor Lo: Hour
+9F.26	DD	all	Temp	Outdoor Lo: Day
+9F.27	Dx	all	Temp	Outdoor Alarm Hi: 'c' of -40<abc<140 deg F @ 1
+9F.27	xH	all	Temp	Outdoor Lo: Month
+9F.28	BD	0,all	Temp	Outdoor Alarm Hi: 'ab' of <abc> F
+9F.28	Bx	1,2
+9F.28	Bx	3	Temp	Outdoor Alarm Hi: Sign 0=+, 1=-
+9F.29	DD	all	Temp	Outdoor Alarm Lo: 'bc' of <abc> F
+9F.30	Bx	all
+9F.30	xB	0	Temp	Outdoor Alarm Lo: 'a' of <abc> F
+9F.30	xB	1,2
+9F.30	xB	3	Temp	Outdoor Alarm Lo: Sign 0=+ 1=-
+9F.31	BB	all
+9F.32	Bx	0,1	Temp	Temp Outdoors Alarm Set when both bits=1
+9F.32	Bx	2,3	Temp	Temp Indoors Alarm Set when both bits=1
+9F.32	xB	all
+9F.33	HH	all	Cksum	unsigned sum of first 33 bytes
+AF. 0	HH	all	Group	AF ----------------------------------------
+AF. 1	DD	all	Barom	Local: 'cd' of 795<abcd<1050 mb @ 1
+AF. 2	DD	all	Barom	Local: 'ab' of <abcd> mb
+AF. 3	DD	all	Barom	SeaLevel: 'de' of 795<abcd.e<1050 mb @ 1
+AF. 4	DD	all	Barom	SeaLevel: 'bc' of <abcd.e> mb
+AF. 5	Bx	0,1	Barom	Format: 0=inches, 1=mm, 2=mb, 3=hpa
+AF. 5	Bx	2,3
+AF. 5	xD	all	Barom	SeaLevel: 'a' of <abcd.e> mb
+AF. 6	Bx	0-2	Barom	Trend: 1=Raising, 2=Steady, 4=Falling
+AF. 6	Bx	3
+AF. 6	xB	all	Barom	Prediction: 1=Sunny, 2=Cloudy, 4=Partly, 8=Rain
+AF. 7	DD	all	Dewpt	Indoor:    0<ab<47 degrees C @ 1
+AF. 8	DD	all	Dewpt	Indoor Hi: <ab> C
+AF. 9	DD	all	Dewpt	Indoor Hi: Minute
+AF.10	DD	all	Dewpt	Indoor Hi: Hour
+AF.11	DD	all	Dewpt	Indoor Hi: Day
+AF.12	Dx	all	Dewpt	Indoor Lo: 'b' of <ab> C
+AF.12	xH	all	Dewpt	Indoor Hi: Month
+AF.13	Dx	all	Dewpt	Indoor Lo: Minute 'b' of <ab>
+AF.13	xD	all	Dewpt	Indoor Lo: 'a' of <ab> C
+AF.14	Dx	all	Dewpt	Indoor Lo: Hour   'b' of <ab>
+AF.14	xD	all	Dewpt	Indoor Lo: Minute 'a' of <ab>
+AF.15	Dx	all	Dewpt	Indoor Lo: Day    'b' of <ab>
+AF.15	xD	all	Dewpt	Indoor Lo: Hour   'a' of <ab>
+AF.16	Hx	all	Dewpt	Indoor Lo: Month
+AF.16	xD	all	Dewpt	Indoor Lo: Day    'a' of <ab>
+AF.17	Hx	all	Dewpt	Outdoor Alarm: 0=1 C ... F=16 C
+AF.17	xH	all	Dewpt	Indoor  Alarm: 0=1 C ... F=16 C
+AF.18	DD	all	Dewpt	Outdoor:    0<ab<56 degrees C @ 1
+AF.19	DD	all	Dewpt	Outdoor Hi: <ab> C
+AF.20	DD	all	Dewpt	Outdoor Hi: Minute
+AF.21	DD	all	Dewpt	Outdoor Hi: Hour
+AF.22	DD	all	Dewpt	Outdoor Hi: Day
+AF.23	Dx	all	Dewpt	Outdoor Lo: 'b' of <ab> C
+AF.23	xH	all	Dewpt	Outdoor Hi: Month
+AF.24	Dx	all	Dewpt	Outdoor Lo: Minute 'b' of <ab>
+AF.24	xD	all	Dewpt	Outdoor Lo: 'a' of <ab> C
+AF.25	Dx	all	Dewpt	Outdoor Lo: Hour   'b' of <ab>
+AF.25	xD	all	Dewpt	Outdoor Lo: Minute 'a' of <ab>
+AF.26	Dx	all	Dewpt	Outdoor Lo: Day    'b' of <ab>
+AF.26	xD	all	Dewpt	Outdoor Lo: Hour   'a' of <ab>
+AF.27	Hx	all	Dewpt	Outdoor Lo: Month
+AF.27	xD	all	Dewpt	Outdoor Lo: Day    'a' of <ab>
+AF.28	Bx	0	Dewpt	Outdoor Lo: O.R. = 1
+AF.28	Bx	1
+AF.28	Bx	2	Dewpt	Outdoor: O.R. = 1
+AF.28	Bx	3	Dewpt	Indoor Lo: O.R. = 1
+AF.28	Bx	0
+AF.28	Bx	1	Dewpt	Indoor: O.R. = 1
+AF.28	Bx	2,3
+AF.29	Bx	0
+AF.29	Bx	1,2	Dewpt	In and Out Alarm Set when both bits=1
+AF.29	Bx	3	Barom	Alarm Set = 1
+AF.29	xH	all	Barom	Alarm: 0=1mb ... F=16mb
+AF.30	HH	all	Cksum	unsigned sum of first 30 bytes
+BF. 0	HH	all	Group	BF ----------------------------------------
+BF. 1	DD	all	Rain	Rate: 'bc' of 0<abc<998 mm/hr @ 1
+BF. 2	Bx	all
+BF. 2	xD	all	Rain	Rate: 'a' of <abc> mm/hr
+BF. 3	DD	all	Rain	Yesterday: 'cd' of 0<abcd<9999 mm @ 1
+BF. 4	DD	all	Rain	Yesterday: 'ab' of <abcd> mm
+BF. 5	DD	all	Rain	Total: 'cd' of <abcd> mm
+BF. 6	DD	all	Rain	Total: 'ab' of <abcd> mm
+BF. 7	DD	all	Rain	Reset: Minute
+BF. 8	DD	all	Rain	Reset: Hour
+BF. 9	DD	all	Rain	Reset: Day
+BF.10	Bx	0
+BF.10	Bx	1	Rain	Format: 0=mm, 1=inches
+BF.10	Bx	2,3
+BF.10	xH	all	Rain	Reset: Month
+BF.11	DD	all	Rain	Alarm: 'bc' of 0<ab.c<39.3 in/hr @ 0.1
+BF.12	Bx	0	Rain	Alarm Set = 1
+BF.12	Bx	1-2
+BF.12	Bx	3	Rain	Rate: O.R. = 1
+BF.12	xD	all	Rain	Rate Alarm: 'a' of <ab.c> in/hr
+BF.13	HH	all	Cksum	Unsigned sum of first 13 bytes
+CF. 0	HH	all	Group	CF ----------------------------------------
+CF. 1	DD	all	Wind	Gust Speed: 'bc' of 0<ab.c<56 m/s @ 0.2
+CF. 2	Dx	all	Wind	Gust Dir:   'c' of 0<abc<359 degrees @ 1
+CF. 2	xD	all	Wind	Gust Speed: 'a' of <ab.c> m/s
+CF. 3	DD	all	Wind	Gust Dir:   'ab' of <abc>
+CF. 4	DD	all	Wind	Avg Speed:  'bc' of 0<ab.c<56 m/s @ 0.1
+CF. 5	Dx	all	Wind	Avg Dir:    'c' of <abc>
+CF. 5	xD	all	Wind	Avg Speed:  'a' of <ab.c> m/s
+CF. 6	DD	all	Wind	Avg Dir:    'ab' of <abc>
+CF. 7	DD	all	Wind	Hi Speed:   'bc' of <ab.c> m/s
+CF. 8	Dx	all	Wind	Hi Dir:     'c' of <abc>
+CF. 8	xD	all	Wind	Hi Speed:   'a' of <ab.c> m/s
+CF. 9	DD	all	Wind	Hi Dir:     'ab' of <abc>
+CF.10	DD	all	Wind	Hi: Minute
+CF.11	DD	all	Wind	Hi: Hour
+CF.12	DD	all	Wind	Hi: Day
+CF.13	Dx	all	Wind	Alarm: 'c' of 0<abc<125 mph @ 1
+CF.13	xH	all	Wind	Hi: Month
+CF.14	Bx	1-3
+CF.14	BD	0,all	Wind	Alarm: 'ab' of <abc> mph
+CF.15	Bx	1
+CF.15	Bx	2,3	Wind	Format: 0=mph, 1=knots, 2=m/s, 3=kph
+CF.15	xB	all
+CF.16	DD	all	Chill	Temp: -85<ab<60 degrees C @ 1
+CF.17	DD	all	Chill	Lo: <ab> C
+CF.18	DD	all	Chill	Lo: Minute
+CF.19	DD	all	Chill	Lo: Hour
+CF.20	DD	all	Chill	Lo: Day
+CF.21	Bx	0	Chill	Lo: Sign 0=+, 1=-
+CF.21	Bx	1	Chill	Temp: Sign 0=+, 1=-
+CF.21	Bx	2,3
+CF.21	xH	all	Chill	Lo: Month
+CF.22	DD	all	Chill	Alarm: 'bc' of -121<abc<140 degrees F @ 1
+CF.23	Bx	0	Chill	Alarm: 'a' of <abc> F
+CF.23	Bx	1
+CF.23	Bx	2	General	Power Source 0=AC, 1=DC
+CF.23	Bx	3	General	Low Battery Indicator = 1
+CF.23	xB	0-2
+CF.23	xB	3	Chill	Alarm: Sign 0=+, 1=-
+CF.24	Bx	0-2	General	Display Selected: 0=Time, 1=Temp ... 7=Rain
+CF.24	Bx	3
+CF.24	xB	0,1	General	Display Subscreen: 0=first ... 3=fourth
+CF.24	xB	2,3	General	Display: 0=main, 1=mem, 2=alarm.in, 3=alarm.out
+CF.25	Bx	0
+CF.25	Bx	1	Wind	Hi Speed: O.R. = 1
+CF.25	Bx	2	Wind	Avg Speed: O.R. = 1
+CF.25	Bx	3	Wind	Gust Speed: O.R. = 1
+CF.25	xB	0
+CF.25	xB	1	Chill	Alarm Set = 1
+CF.25	xB	2	Wind	Alarm Set = 1
+CF.25	xB	3
+CF.26	HH	all	Cksum	Unsigned sum of first 26 bytes
+
+======================================================================
+
+Nibble Column:
+  D-> 4 bit decimal number Range: 0-9
+  H-> 4 bit hex number Range: 0-15
+  B-> Bit encoded value Range: Variable
+  x-> Not defined in this entry
+
+Bits Column:
+  Bits within defined Nibbles
+  0 - Lo order
+  3 - Hi order
+
+General:
+All data is sent in the units shown and is independent of the units selected.
+Data is sent 9600 baud 8n1.
+Sensors that are not functioning or are out of range will return 'EE' as
+the measurement.
+
+Cksum:
+The last byte in each group is a checksum of that group. It is
+calculated by performing an unsigned add of all the bytes in the
+group, including the group number but not the checksum byte. The
+checksum is the lo-order byte of the sum.
+
+Group Info
+Group   Length  Report  Contents
+Number  (Bytes) Intervl Summary
+8F      35      10 Sec  Time, Humidity
+9F      34      10 Sec  Temperature
+AF      31      10 Sec  Barometer, Dew Point
+BF      14      10 Sec  Rain
+CF      27      5 Sec   Wind, Wind Chill, General
+
+Contributors:  Mike Wingstrom <mikeasl@ameritech.net> (Most of the hard work)
+               Glynne Tolar <glynne@pdq.net> (alarms and misc.)
+               Tim Witham - FES <twitham@pcocd2.intel.com> (listing format,
+                                                            fixing of errors and misc.)
