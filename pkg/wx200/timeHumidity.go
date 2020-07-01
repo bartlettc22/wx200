@@ -1,20 +1,26 @@
 package wx200
 
 import (
-	"errors"
+	// "errors"
+	// "github.com/davecgh/go-spew/spew"
 	"time"
 )
 
+// Time holds time values, formats and alarm data
 type Time struct {
-	Second       int8
-	Minute       int8
-	Hour         int8
-	Day          int8
+
+	// LastDataRecieved contains the time the last data was received
+	LastDataRecieved time.Time
+
+	Second       uint8
+	Minute       uint8
+	Hour         uint8
+	Day          uint8
 	HourFormat24 bool // Is time in 24-hour format
 	DateFormatMD bool // Is date in month-day format (day-month, if false)
-	Month        int8
-	AlarmMinute  int8
-	AlarmHour    int8
+	Month        uint8
+	AlarmMinute  uint8
+	AlarmHour    uint8
 	AlarmSet     bool
 }
 
@@ -25,13 +31,13 @@ type Humidity struct {
 	LastDataRecieved time.Time
 
 	// Current indoor humidity (%)
-	Indoor int8
+	Indoor uint8
 
 	// Current indoor humidity out of range
 	IndoorOR bool
 
 	// Record high for indoor humidity (%)
-	IndoorHi int8
+	IndoorHi uint8
 
 	// Record high for indoor humidity out of range
 	IndoorHiOR bool
@@ -40,177 +46,148 @@ type Humidity struct {
 	IndoorHiDate time.Time
 
 	// Threshhold for alarm for high indoor humidity (%)
-	IndoorAlarmHi int8
+	IndoorAlarmHi uint8
 
 	// Record low for indoor humidity (%)
-	IndoorLo int8
+	IndoorLo uint8
 
 	// Date of record low for indoor humidity
 	IndoorLoDate time.Time
 
 	// Threshhold for alerm for low indoor humidity (%)
-	IndoorAlarmLo int8
+	IndoorAlarmLo uint8
 
 	// Alarm for indoor humidity is set
 	IndoorAlarmSet bool
 
+	// Current outdoor humidity (%)
+	Outdoor uint8
+
 	// Current outdoor humidity out of range
 	OutdoorOR bool
+
+	// Record high for outdoor humidity (%)
+	OutdoorHi uint8
 
 	// Record high for outdoor humidity out of range
 	OutdoorHiOR bool
 
+	// Date of record high for outdoor humidity
+	OutdoorHiDate time.Time
+
 	// Threshhold for alarm for high outdoor humidity (%)
-	OutdoorAlarmHi int8
+	OutdoorAlarmHi uint8
+
+	// Record low for outdoor humidity (%)
+	OutdoorLo uint8
+
+	// Date of record low for outdoor humidity
+	OutdoorLoDate time.Time
 
 	// Threshhold for alerm for low outdoor humidity (%)
-	OutdoorAlarmLo int8
+	OutdoorAlarmLo uint8
 
 	// Alarm for outdoor humidity is set
 	OutdoorAlarmSet bool
-
-	// Checksum
-	ChecksumValid bool
 }
 
 func (w *WX200) ReadTimeHumidity() error {
 
 	now := time.Now()
-	err := readSerial(w.comPort, bufTimeHumidity)
+	_, err := w.readSample(w.bufTimeHumidity, HEADER_TIME_HUMIDITY)
 	if err != nil {
 		return err
 	}
+	// err := readSerial(w.comPort, w.bufTimeHumidity)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// // Validate checksum
+	// checksumValid := validateChecksum(HEADER_TIME_HUMIDITY, w.bufTimeHumidity)
+	// if !checksumValid {
+	// 	return errors.New("Checksum failed on group 'Time/Humidity'")
+	// }
 
 	t := Time{}
-	t.Second = getCombinedDecimal(bufTimeHumidity[0])
-	t.Minute = getCombinedDecimal(bufTimeHumidity[1])
-	t.Hour = getCombinedDecimal(bufTimeHumidity[2])
-	t.Day = getCombinedDecimal(bufTimeHumidity[3])
-	s1, s2 := splitByte(bufTimeHumidity[4])
+	t.LastDataRecieved = now
+	t.Second = getCombinedDecimal(w.bufTimeHumidity[0])
+	t.Minute = getCombinedDecimal(w.bufTimeHumidity[1])
+	t.Hour = getCombinedDecimal(w.bufTimeHumidity[2])
+	t.Day = getCombinedDecimal(w.bufTimeHumidity[3])
+	s1, s2 := splitByte(w.bufTimeHumidity[4])
 	t.HourFormat24 = isBitSet(s1, 0)
 	t.DateFormatMD = isBitSet(s1, 1)
-	t.Month = int8(s2)
-	t.AlarmMinute = getCombinedDecimal(bufTimeHumidity[5])
-	t.AlarmHour = getCombinedDecimal(bufTimeHumidity[6])
+	t.Month = uint8(s2)
+	t.AlarmMinute = getCombinedDecimal(w.bufTimeHumidity[5])
+	t.AlarmHour = getCombinedDecimal(w.bufTimeHumidity[6])
 
 	var (
 		indoorHiMonth  byte
 		indoorLoMonth  byte
 		indoorLo       [2]byte
-		indoorHiMinute int8
+		indoorHiMinute uint8
 		indoorLoMinute [2]byte
-		indoorHiHour   int8
+		indoorHiHour   uint8
 		indoorLoHour   [2]byte
-		indoorHiDay    int8
+		indoorHiDay    uint8
 		indoorLoDay    [2]byte
 	)
-	indoorHiMinute = getCombinedDecimal(bufTimeHumidity[9])
-	indoorHiHour = getCombinedDecimal(bufTimeHumidity[10])
-	indoorHiDay = getCombinedDecimal(bufTimeHumidity[11])
-	indoorLo[1], indoorHiMonth = splitByte(bufTimeHumidity[12])
-	indoorLoMinute[1], indoorLo[0] = splitByte(bufTimeHumidity[13])
-	indoorLoHour[1], indoorLoMinute[0] = splitByte(bufTimeHumidity[14])
-	indoorLoDay[1], indoorLoHour[0] = splitByte(bufTimeHumidity[15])
-	indoorLoMonth, indoorLoDay[0] = splitByte(bufTimeHumidity[16])
-	x, y := splitByte(bufTimeHumidity[31])
-	x1, y1 := splitByte(bufTimeHumidity[32])
+	indoorHiMinute = getCombinedDecimal(w.bufTimeHumidity[9])
+	indoorHiHour = getCombinedDecimal(w.bufTimeHumidity[10])
+	indoorHiDay = getCombinedDecimal(w.bufTimeHumidity[11])
+	indoorLo[1], indoorHiMonth = splitByte(w.bufTimeHumidity[12])
+	indoorLoMinute[1], indoorLo[0] = splitByte(w.bufTimeHumidity[13])
+	indoorLoHour[1], indoorLoMinute[0] = splitByte(w.bufTimeHumidity[14])
+	indoorLoDay[1], indoorLoHour[0] = splitByte(w.bufTimeHumidity[15])
+	indoorLoMonth, indoorLoDay[0] = splitByte(w.bufTimeHumidity[16])
+	x, y := splitByte(w.bufTimeHumidity[31])
+	x1, y1 := splitByte(w.bufTimeHumidity[32])
 
 	h := Humidity{}
 	h.LastDataRecieved = now
-	h.Indoor = getCombinedDecimal(bufTimeHumidity[7])
+	h.Indoor = getCombinedDecimal(w.bufTimeHumidity[7])
 	h.IndoorOR = isBitSet(x, 3)
-	h.IndoorHi = getCombinedDecimal(bufTimeHumidity[8])
+	h.IndoorHi = getCombinedDecimal(w.bufTimeHumidity[8])
 	h.IndoorHiOR = isBitSet(x, 2)
 	h.IndoorLo = combineDecimal(indoorLo)
 	h.IndoorLoDate = makeRecordDate(int(indoorLoMonth), int(combineDecimal(indoorLoDay)), int(combineDecimal(indoorLoHour)), int(combineDecimal(indoorLoMinute)))
 	h.IndoorHiDate = makeRecordDate(int(indoorHiMonth), int(indoorHiDay), int(indoorHiHour), int(indoorHiMinute))
-	h.IndoorAlarmHi = getCombinedDecimal(bufTimeHumidity[17])
-	h.IndoorAlarmLo = getCombinedDecimal(bufTimeHumidity[18])
+	h.IndoorAlarmHi = getCombinedDecimal(w.bufTimeHumidity[17])
+	h.IndoorAlarmLo = getCombinedDecimal(w.bufTimeHumidity[18])
 	h.IndoorAlarmSet = isBitSet(x1, 2) && isBitSet(x1, 3)
-
+	h.Outdoor = getCombinedDecimal(w.bufTimeHumidity[19])
+	h.OutdoorHi = getCombinedDecimal(w.bufTimeHumidity[20])
 	h.OutdoorOR = isBitSet(x, 0)
 	h.OutdoorHiOR = isBitSet(y, 3)
-	h.OutdoorAlarmHi = getCombinedDecimal(bufTimeHumidity[29])
-	h.OutdoorAlarmLo = getCombinedDecimal(bufTimeHumidity[30])
+	outdoorHiMinute := getCombinedDecimal(w.bufTimeHumidity[21])
+	outdoorHiHour := getCombinedDecimal(w.bufTimeHumidity[22])
+	outdoorHiDay := getCombinedDecimal(w.bufTimeHumidity[23])
+	ho0, outdoorHiMonth := splitByte(w.bufTimeHumidity[24])
+	ho1, ho2 := splitByte(w.bufTimeHumidity[25])
+	ho3, ho4 := splitByte(w.bufTimeHumidity[26])
+	ho5, ho6 := splitByte(w.bufTimeHumidity[27])
+	outdoorLoMonth, ho7 := splitByte(w.bufTimeHumidity[28])
+	h.OutdoorLo = combineDecimal([2]byte{ho2, ho0})
+	outdoorLoMinute := combineDecimal([2]byte{ho4, ho1})
+	outdoorLoHour := combineDecimal([2]byte{ho6, ho3})
+	outdoorLoDay := combineDecimal([2]byte{ho7, ho5})
+	h.OutdoorLoDate = makeRecordDate(int(outdoorLoMonth), int(outdoorLoDay), int(outdoorLoHour), int(outdoorLoMinute))
+
+	h.OutdoorHiDate = makeRecordDate(int(outdoorHiMonth), int(outdoorHiDay), int(outdoorHiHour), int(outdoorHiMinute))
+	h.OutdoorAlarmHi = getCombinedDecimal(w.bufTimeHumidity[29])
+	h.OutdoorAlarmLo = getCombinedDecimal(w.bufTimeHumidity[30])
 	h.OutdoorAlarmSet = isBitSet(x1, 0) && isBitSet(x1, 1)
 
 	t.AlarmSet = isBitSet(y1, 3)
-	// spew.Dump(t)
-	// spew.Dump(h)
 
-	w.Humidity = h
-
-	// Validate checksum
-	checksumValid := validateChecksum(HEADER_TIME_HUMIDITY, bufTimeHumidity)
-	if !checksumValid {
-		return errors.New("Checksum failed on group 'Time/Humidity')")
+	// Push our values to their respective data channels
+	if w.config.TimeDataChan != nil {
+		w.config.TimeDataChan <- t
+	}
+	if w.config.HumidityDataChan != nil {
+		w.config.HumidityDataChan <- h
 	}
 
 	return nil
-}
-
-// Gets a 2-digit combined decimal value 0-99
-func getCombinedDecimal(b byte) int8 {
-	b1, b2 := splitByte(b)
-	return combineDecimal([2]byte{b1, b2})
-}
-
-func combineDecimal(b [2]byte) int8 {
-	return int8(b[0]*10 + b[1])
-}
-
-// Splits the byte up into two bytes
-// byte[0] = first 4 bits
-// byte[1] = last 4 bits
-func splitByte(b byte) (byte, byte) {
-	return b >> 4, b & '\x0f'
-}
-
-// combineByte takes two bytes (presumably with only 4 bits of data) and combines them to one
-// 00000011, 00001100 becomes 00111100, etc.
-func combineByte(b [2]byte) byte {
-	return b[0]<<4 | b[1]
-}
-
-// isBitSet return true if the bit at position p is set
-// p=0 is rightmost bit, p=7 is leftmost bit
-func isBitSet(b byte, p int8) bool {
-
-	if p >= 0 && p <= 7 {
-		return (b>>p)&1 == 1
-	}
-
-	// out of bounds
-	return false
-
-}
-
-// Presumes that if month/day has not already passed this year, that the record was set last year
-func makeRecordDate(month int, day int, hour int, minute int) time.Time {
-
-	now := time.Now()
-	y := now.Year()
-	if (time.Month(month) > now.Month()) || (time.Month(month) == now.Month() && day > now.Day()) {
-		y = y - 1
-	}
-
-	return time.Date(y, time.Month(month), day, hour, minute, 0, 0, time.UTC)
-}
-
-// validateChecksum validates that the data was passed over the serial line correctly
-// This is done by adding up each byte of the group (including the group header) and
-// comparing it to the checksum byte
-func validateChecksum(headerByte byte, data []byte) bool {
-
-	// The expected checksum byte comes in as the last byte of data
-	expectedChecksum := data[len(data)-1]
-
-	// Add up the header + data (skipping the checksum byte)
-	checkSum := int(headerByte)
-	for _, val := range data[:len(data)-2] {
-		checkSum = checkSum + int(val)
-	}
-
-	return int8(checkSum) == int8(expectedChecksum)
-
 }
