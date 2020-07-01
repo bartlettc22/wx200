@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// General contains general WX200 display information
 type General struct {
 
 	// LastDataRecieved contains the time the last data was received
@@ -62,6 +63,7 @@ const (
 	WIND_UNITS_KPH
 )
 
+// Wind contains wind speed/direction values, history and alarm information
 type Wind struct {
 
 	// LastDataRecieved contains the time the last data was received
@@ -97,8 +99,8 @@ type Wind struct {
 	// Record high wind speed date
 	HiDate time.Time
 
-	// High wind alarm threshhold (0m/s to 56m/s)
-	AlarmThreshhold int8
+	// High wind alarm threshold (0m/s to 56m/s)
+	AlarmThreshold int8
 
 	// High wind alarm set
 	AlarmSet bool
@@ -118,8 +120,8 @@ type WindChill struct {
 	// Record low wind chill date
 	ChillLoDate time.Time
 
-	// Wind chill alarm threshhold (-85C to 60C)
-	ChillAlarmThreshhold int16
+	// Wind chill alarm threshold (-85C to 60C)
+	ChillAlarmThreshold int16
 
 	// Wind chill alarm set
 	ChillAlarmSet bool
@@ -129,7 +131,7 @@ func (w *WX200) readWindGeneral() error {
 
 	// now := time.Now()
 	now := time.Now()
-	buf, err := w.readSample(w.bufWindGeneral, HEADER_WIND_GENERAL)
+	buf, err := w.readSample(w.bufWindGeneral, header_wind_general)
 	if err != nil {
 		return err
 	}
@@ -162,7 +164,7 @@ func (w *WX200) readWindGeneral() error {
 	wind.HiSpeedOR = isBitSet(buf[25][0], 1)
 	wind.HiDirection = uint16(combineDecimal(buf[9]))*10 + uint16(buf[8][0])
 	wind.HiDate = makeRecordDate(int(buf[13][1]), int(combineDecimal(buf[12])), int(combineDecimal(buf[11])), int(combineDecimal(buf[10])))
-	wind.AlarmThreshhold = int8(buf[14][1])*10 + int8(buf[13][0])
+	wind.AlarmThreshold = int8(buf[14][1])*10 + int8(buf[13][0])
 	wind.AlarmSet = isBitSet(buf[25][1], 2)
 	wind.DisplayUnits, err = SubDecimal(buf[15][0], 2, 3)
 	w.error(err)
@@ -183,15 +185,15 @@ func (w *WX200) readWindGeneral() error {
 	}
 	chill.ChillLo = int8(combineDecimal(buf[17])) * chillLoSign
 	chill.ChillLoDate = makeRecordDate(int(buf[21][1]), int(combineDecimal(buf[20])), int(combineDecimal(buf[19])), int(combineDecimal(buf[18])))
-	chillAlarmThreshholdMultiplier, err := SubDecimal(buf[23][0], 0, 0)
+	chillAlarmThresholdMultiplier, err := SubDecimal(buf[23][0], 0, 0)
 	w.error(err)
 	chillAlarmSign := int16(1)
 	if isBitSet(buf[23][1], 3) {
 		chillAlarmSign = -1
 	}
 	// Wind chill alarm data is in F for some reason so we convert to C
-	chillAlarmF := (int16(chillAlarmThreshholdMultiplier)*100 + int16(combineDecimal(buf[22]))) * chillAlarmSign
-	chill.ChillAlarmThreshhold = int16(float32(chillAlarmF-32.0) * (float32(5) / float32(9)))
+	chillAlarmF := (int16(chillAlarmThresholdMultiplier)*100 + int16(combineDecimal(buf[22]))) * chillAlarmSign
+	chill.ChillAlarmThreshold = int16(float32(chillAlarmF-32.0) * (float32(5) / float32(9)))
 	chill.ChillAlarmSet = isBitSet(buf[25][1], 1)
 	if w.config.WindChillDataChan != nil {
 		w.config.WindChillDataChan <- chill

@@ -45,7 +45,7 @@ type Humidity struct {
 	// Date of record high for indoor humidity
 	IndoorHiDate time.Time
 
-	// Threshhold for alarm for high indoor humidity (%)
+	// Threshold for alarm for high indoor humidity (%)
 	IndoorAlarmHi uint8
 
 	// Record low for indoor humidity (%)
@@ -54,7 +54,7 @@ type Humidity struct {
 	// Date of record low for indoor humidity
 	IndoorLoDate time.Time
 
-	// Threshhold for alerm for low indoor humidity (%)
+	// Threshold for alerm for low indoor humidity (%)
 	IndoorAlarmLo uint8
 
 	// Alarm for indoor humidity is set
@@ -75,7 +75,7 @@ type Humidity struct {
 	// Date of record high for outdoor humidity
 	OutdoorHiDate time.Time
 
-	// Threshhold for alarm for high outdoor humidity (%)
+	// Threshold for alarm for high outdoor humidity (%)
 	OutdoorAlarmHi uint8
 
 	// Record low for outdoor humidity (%)
@@ -84,7 +84,7 @@ type Humidity struct {
 	// Date of record low for outdoor humidity
 	OutdoorLoDate time.Time
 
-	// Threshhold for alerm for low outdoor humidity (%)
+	// Threshold for alerm for low outdoor humidity (%)
 	OutdoorAlarmLo uint8
 
 	// Alarm for outdoor humidity is set
@@ -94,7 +94,7 @@ type Humidity struct {
 func (w *WX200) ReadTimeHumidity() error {
 
 	now := time.Now()
-	_, err := w.readSample(w.bufTimeHumidity, HEADER_TIME_HUMIDITY)
+	_, err := w.readSample(w.bufTimeHumidity, header_time_humidity)
 	if err != nil {
 		return err
 	}

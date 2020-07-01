@@ -25,6 +25,7 @@ const (
 	BARO_PREDICTION_RAINY  = 8
 )
 
+// Barometer contains pressure values, history and alarm information
 type Barometer struct {
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
@@ -47,13 +48,14 @@ type Barometer struct {
 	// sunny=1, cloudy=2, partly=4, rainy=8
 	Prediction uint8
 
-	// Barometer alarm threshhold (1mb to 16mb)
-	AlarmThreshhold uint8
+	// Barometer alarm threshold (1mb to 16mb)
+	AlarmThreshold uint8
 
 	// Barometer alarm set
 	AlarmSet bool
 }
 
+// DewPoint contains dew point values, history and alarm information
 type DewPoint struct {
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
@@ -79,8 +81,8 @@ type DewPoint struct {
 	// Record low indoor dew point date
 	IndoorLoDate time.Time
 
-	// Indoor dew point alarm threshhold (1C to 16C)
-	IndoorAlarmThreshhold uint8
+	// Indoor dew point alarm threshold (1C to 16C)
+	IndoorAlarmThreshold uint8
 
 	// Outdoor dew point (0C to 56C)
 	Outdoor uint8
@@ -103,8 +105,8 @@ type DewPoint struct {
 	// Record low outdoor dew point date
 	OutdoorLoDate time.Time
 
-	// Outdoor dew point alarm threshhold (1C to 16C)
-	OutdoorAlarmThreshhold uint8
+	// Outdoor dew point alarm threshold (1C to 16C)
+	OutdoorAlarmThreshold uint8
 
 	// Dew point alarm is set
 	AlarmSet bool
@@ -113,7 +115,7 @@ type DewPoint struct {
 func (w *WX200) readBaroDew() error {
 
 	now := time.Now()
-	buf, err := w.readSample(w.bufBaroDew, HEADER_BARO_DEW)
+	buf, err := w.readSample(w.bufBaroDew, header_baro_dew)
 	if err != nil {
 		return err
 	}
@@ -128,8 +130,8 @@ func (w *WX200) readBaroDew() error {
 	baro.Trend, err = SubDecimal(buf[6][0], 0, 2)
 	w.error(err)
 	baro.Prediction = uint8(buf[6][1])
-	// Threshhold comes out indexed at 0 so we have to add one
-	baro.AlarmThreshhold = uint8(buf[29][1]) + 1
+	// Threshold comes out indexed at 0 so we have to add one
+	baro.AlarmThreshold = uint8(buf[29][1]) + 1
 	baro.AlarmSet = isBitSet(buf[29][0], 3)
 	if w.config.BarometerDataChan != nil {
 		w.config.BarometerDataChan <- baro
@@ -139,25 +141,29 @@ func (w *WX200) readBaroDew() error {
 	dew := DewPoint{}
 	dew.LastDataRecieved = now
 	dew.Indoor = combineDecimal(buf[7])
-	dew.IndoorOR = isBitSet(buf[28][1], 1)
+	// serial proto mapping doc has error - I believe what is below is correct
+	dew.IndoorOR = isBitSet(buf[28][0], 1)
 	dew.IndoorHi = combineDecimal(buf[8])
 	dew.IndoorHiDate = makeRecordDate(int(buf[12][1]), int(combineDecimal(buf[11])), int(combineDecimal(buf[10])), int(combineDecimal(buf[9])))
 	dew.IndoorLo = combineDecimal([2]byte{buf[13][1], buf[12][0]})
-	dew.IndoorLoOR = isBitSet(buf[28][0], 3)
+	// serial proto mapping doc has error - I believe what is below is correct
+	dew.IndoorLoOR = isBitSet(buf[28][1], 3)
 	dew.IndoorLoDate = makeRecordDate(int(buf[16][0]), int(combineDecimal([2]byte{buf[16][1], buf[15][0]})), int(combineDecimal([2]byte{buf[15][1], buf[14][0]})), int(combineDecimal([2]byte{buf[14][1], buf[13][0]})))
-	// Threshhold comes out indexed at 0 so we have to add one
-	dew.IndoorAlarmThreshhold = uint8(buf[17][1]) + 1
+	// Threshold comes out indexed at 0 so we have to add one
+	dew.IndoorAlarmThreshold = uint8(buf[17][1]) + 1
 
 	dew.Outdoor = combineDecimal(buf[18])
-	dew.OutdoorOR = isBitSet(buf[28][0], 2)
+	// serial proto mapping doc has error - I believe what is below is correct
+	dew.OutdoorOR = isBitSet(buf[28][1], 2)
 	dew.OutdoorHi = combineDecimal(buf[19])
 	spew.Dump(buf[28])
 	dew.OutdoorHiDate = makeRecordDate(int(buf[23][1]), int(combineDecimal(buf[22])), int(combineDecimal(buf[21])), int(combineDecimal(buf[20])))
 	dew.OutdoorLo = combineDecimal([2]byte{buf[24][1], buf[23][0]})
-	dew.OutdoorLoOR = isBitSet(buf[28][0], 0)
+	// serial proto mapping doc has error - I believe what is below is correct
+	dew.OutdoorLoOR = isBitSet(buf[28][1], 0)
 	dew.OutdoorLoDate = makeRecordDate(int(buf[27][0]), int(combineDecimal([2]byte{buf[27][1], buf[26][0]})), int(combineDecimal([2]byte{buf[26][1], buf[25][0]})), int(combineDecimal([2]byte{buf[25][1], buf[24][0]})))
-	// Threshhold comes out indexed at 0 so we have to add one
-	dew.OutdoorAlarmThreshhold = uint8(buf[17][0]) + 1
+	// Threshold comes out indexed at 0 so we have to add one
+	dew.OutdoorAlarmThreshold = uint8(buf[17][0]) + 1
 
 	dew.AlarmSet = isBitSet(buf[29][0], 1) && isBitSet(buf[29][0], 2)
 	if w.config.DewPointDataChan != nil {

@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Temperature contains temperature values, history and alarm information
 type Temperature struct {
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
@@ -12,7 +13,7 @@ type Temperature struct {
 func (w *WX200) readTemperature() error {
 
 	now := time.Now()
-	_, err := w.readSample(w.bufTemperature, HEADER_TEMPERATURE)
+	_, err := w.readSample(w.bufTemperature, header_temperature)
 	if err != nil {
 		return err
 	}

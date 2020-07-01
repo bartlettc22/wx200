@@ -5,31 +5,31 @@ import "testing"
 func TestSubDecimal(t *testing.T) {
 
 	b := byte('\xff')
-	val, err := SubDecimal(b, 0, 0)
+	val, _ := SubDecimal(b, 0, 0)
 	if val != 1 {
 		t.Errorf("Decimal value was not correct, got: %d, want: %d.", val, 1)
 	}
 
 	b = byte('\xff')
-	val, err = SubDecimal(b, 0, 7)
+	val, _ = SubDecimal(b, 0, 7)
 	if val != 255 {
 		t.Errorf("Decimal value was not correct, got: %d, want: %d.", val, 255)
 	}
 
 	b = byte('\xff')
-	val, err = SubDecimal(b, 6, 6)
+	val, _ = SubDecimal(b, 6, 6)
 	if val != 1 {
 		t.Errorf("Decimal value was not correct, got: %d, want: %d.", val, 1)
 	}
 
 	b = byte('\xaa')
-	val, err = SubDecimal(b, 1, 6)
+	val, _ = SubDecimal(b, 1, 6)
 	if val != 21 {
 		t.Errorf("Decimal value was not correct, got: %d, want: %d.", val, 21)
 	}
 
 	b = byte('\xff')
-	val, err = SubDecimal(b, 6, 5)
+	val, err := SubDecimal(b, 6, 5)
 	if err == nil {
 		t.Errorf("Should have gotten out of order error")
 	}

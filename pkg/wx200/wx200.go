@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	HEADER_TIME_HUMIDITY = 0x8f
-	HEADER_TEMPERATURE   = 0x9f
-	HEADER_BARO_DEW      = 0xaf
-	HEADER_RAIN          = 0xbf
-	HEADER_WIND_GENERAL  = 0xcf
+	header_time_humidity = 0x8f
+	header_temperature   = 0x9f
+	header_baro_dew      = 0xaf
+	header_rain          = 0xbf
+	header_wind_general  = 0xcf
 )
 
 type Config struct {
@@ -101,17 +101,18 @@ func (w *WX200) Go() {
 		}
 
 		switch headerByte[0] {
-		case HEADER_TIME_HUMIDITY:
+		case header_time_humidity:
 			err = w.ReadTimeHumidity()
-		case HEADER_TEMPERATURE:
+		case header_temperature:
 			err = w.readTemperature()
-		case HEADER_BARO_DEW:
+		case header_baro_dew:
 			err = w.readBaroDew()
-		case HEADER_RAIN:
+		case header_rain:
 			err = w.readRain()
-		case HEADER_WIND_GENERAL:
+		case header_wind_general:
 			err = w.readWindGeneral()
 		default:
+			err = nil
 			// err = errors.New(fmt.Sprintf("Recieved unknown serial data header x%02x...", headerByte[0]))
 		}
 

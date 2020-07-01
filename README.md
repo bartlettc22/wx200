@@ -7,7 +7,7 @@ This project contains the following:
 
 
 ## Credits
-This project could not have been completed without the work of Mike Wingstrom, Glynne Tolar and Tim Witham at http://wx200.planetfall.com/.  The [serial protocol mapping](http://wx200.planetfall.com/wx200.txt) (also located [here](docs/wx200_serial_protocol.txt)) was invaluable to parsing out the data in a timely manner.
+This project could not have been completed without the work of Mike Wingstrom, Glynne Tolar and Tim Witham at [wx200.planetfall.com](http://wx200.planetfall.com/).  Their [serial protocol mapping](http://wx200.planetfall.com/wx200.txt) (also located [here](docs/wx200_serial_protocol.txt)) was invaluable to parsing out the data in a timely manner.
 
 ## Using the Prometheus exporter
 * TBD

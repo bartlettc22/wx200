@@ -1,7 +1,6 @@
 package wx200
 
 import (
-	"errors"
 	"fmt"
 	"io"
 )
@@ -10,7 +9,7 @@ import (
 func readSerial(r io.ReadWriteCloser, buf []byte) error {
 	_, err := io.ReadFull(r, buf)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error reading %d bytes from serial: %v", len(buf), err))
+		return fmt.Errorf("Error reading %d bytes from serial: %v", len(buf), err)
 	}
 	// fmt.Printf("%d bytes read from serial\n", bytesRead)
 

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Rain contains rainfall values, history and alarm information
 type Rain struct {
 
 	// LastDataRecieved contains the time the last data was received
@@ -35,7 +36,7 @@ func (w *WX200) readRain() error {
 	// buf := chopBuffer(w.bufRain)
 
 	now := time.Now()
-	buf, err := w.readSample(w.bufRain, HEADER_RAIN)
+	buf, err := w.readSample(w.bufRain, header_rain)
 	if err != nil {
 		return err
 	}
