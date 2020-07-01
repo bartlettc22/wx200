@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Barometer Units enumerations
+// Barometer units enumerations
 const (
 	BARO_UNITS_IN = iota
 	BARO_UNITS_MM
@@ -13,14 +13,14 @@ const (
 	BARO_UNITS_HPA
 )
 
-// Barometer Trend enumerations
+// Barometer trend enumerations
 const (
 	BARO_TREND_RISING  = 1
 	BARO_TREND_STEADY  = 2
 	BARO_TREND_FALLING = 4
 )
 
-// Barometer Prediction enumerations
+// Barometer prediction enumerations
 const (
 	BARO_PREDICTION_SUNNY  = 1
 	BARO_PREDICTION_CLOUDY = 2
@@ -118,7 +118,7 @@ type DewPoint struct {
 func (w *WX200) readBaroDew() error {
 
 	now := time.Now()
-	buf, err := w.readSample(w.bufBaroDew, header_baro_dew)
+	buf, err := w.readSample(w.bufBaroDew, headerBaroDew)
 	if err != nil {
 		return err
 	}

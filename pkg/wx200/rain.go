@@ -36,7 +36,7 @@ func (w *WX200) readRain() error {
 	// buf := chopBuffer(w.bufRain)
 
 	now := time.Now()
-	buf, err := w.readSample(w.bufRain, header_rain)
+	buf, err := w.readSample(w.bufRain, headerRain)
 	if err != nil {
 		return err
 	}

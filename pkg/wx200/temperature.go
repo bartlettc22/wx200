@@ -13,7 +13,7 @@ type Temperature struct {
 func (w *WX200) readTemperature() error {
 
 	now := time.Now()
-	_, err := w.readSample(w.bufTemperature, header_temperature)
+	_, err := w.readSample(w.bufTemperature, headerTemperature)
 	if err != nil {
 		return err
 	}

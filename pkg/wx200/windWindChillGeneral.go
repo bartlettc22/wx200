@@ -31,6 +31,7 @@ type General struct {
 	DisplayType uint8
 }
 
+// General display selection enumerations
 const (
 	DISPLAY_SELECTED_TIME = iota
 	DISPLAY_SELECTED_TEMP
@@ -42,6 +43,7 @@ const (
 	DISPLAY_SELECTED_RAIN
 )
 
+// General display sub-selection enumerations
 const (
 	DISPLAY_SUB_FIRST = iota
 	DISPLAY_SUB_SECOND
@@ -49,6 +51,7 @@ const (
 	DISPLAY_SUB_FOURTH
 )
 
+// General display type enumerations
 const (
 	DISPLAY_TYPE_MAIN = iota
 	DISPLAY_TYPE_MEM
@@ -56,6 +59,7 @@ const (
 	DISPLAY_TYPE_ALARM_OUT
 )
 
+// Wind units enumerations
 const (
 	WIND_UNITS_MPH = iota
 	WIND_UNITS_KNOTS
@@ -131,7 +135,7 @@ func (w *WX200) readWindGeneral() error {
 
 	// now := time.Now()
 	now := time.Now()
-	buf, err := w.readSample(w.bufWindGeneral, header_wind_general)
+	buf, err := w.readSample(w.bufWindGeneral, headerWindGeneral)
 	if err != nil {
 		return err
 	}

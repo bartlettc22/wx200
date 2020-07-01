@@ -1,7 +1,6 @@
 package wx200
 
 import (
-	"errors"
 	"fmt"
 	"github.com/jacobsa/go-serial/serial"
 	"io"
@@ -10,11 +9,11 @@ import (
 )
 
 const (
-	header_time_humidity = 0x8f
-	header_temperature   = 0x9f
-	header_baro_dew      = 0xaf
-	header_rain          = 0xbf
-	header_wind_general  = 0xcf
+	headerTimeHumidity = 0x8f
+	headerTemperature  = 0x9f
+	headerBaroDew      = 0xaf
+	headerRain         = 0xbf
+	headerWindGeneral  = 0xcf
 )
 
 type Config struct {
@@ -95,21 +94,21 @@ func (w *WX200) Go() {
 		// Read in first byte to determine header
 		_, err := w.comPort.Read(headerByte)
 		if err != nil {
-			w.error(errors.New(fmt.Sprintf("Error reading serial data: %v. Reconnecting...", err)))
+			w.error(fmt.Errorf("Error reading serial data: %v. Reconnecting...", err))
 			reconnect = true
 			continue
 		}
 
 		switch headerByte[0] {
-		case header_time_humidity:
+		case headerTimeHumidity:
 			err = w.readTimeHumidity()
-		case header_temperature:
+		case headerTemperature:
 			err = w.readTemperature()
-		case header_baro_dew:
+		case headerBaroDew:
 			err = w.readBaroDew()
-		case header_rain:
+		case headerRain:
 			err = w.readRain()
-		case header_wind_general:
+		case headerWindGeneral:
 			err = w.readWindGeneral()
 		default:
 			err = nil

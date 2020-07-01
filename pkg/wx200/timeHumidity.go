@@ -94,7 +94,7 @@ type Humidity struct {
 func (w *WX200) readTimeHumidity() error {
 
 	now := time.Now()
-	_, err := w.readSample(w.bufTimeHumidity, header_time_humidity)
+	_, err := w.readSample(w.bufTimeHumidity, headerTimeHumidity)
 	if err != nil {
 		return err
 	}
