@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Barometer Units enumerations
 const (
 	BARO_UNITS_IN = iota
 	BARO_UNITS_MM
@@ -12,12 +13,14 @@ const (
 	BARO_UNITS_HPA
 )
 
+// Barometer Trend enumerations
 const (
 	BARO_TREND_RISING  = 1
 	BARO_TREND_STEADY  = 2
 	BARO_TREND_FALLING = 4
 )
 
+// Barometer Prediction enumerations
 const (
 	BARO_PREDICTION_SUNNY  = 1
 	BARO_PREDICTION_CLOUDY = 2

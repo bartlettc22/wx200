@@ -29,13 +29,13 @@ func TestSubDecimal(t *testing.T) {
 	}
 
 	b = byte('\xff')
-	val, err := SubDecimal(b, 6, 5)
+	_, err := SubDecimal(b, 6, 5)
 	if err == nil {
 		t.Errorf("Should have gotten out of order error")
 	}
 
 	b = byte('\xff')
-	val, err = SubDecimal(b, 0, 8)
+	_, err = SubDecimal(b, 0, 8)
 	if err == nil {
 		t.Errorf("Should have gotten out of bounds error")
 	}

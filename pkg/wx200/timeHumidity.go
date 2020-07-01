@@ -91,7 +91,7 @@ type Humidity struct {
 	OutdoorAlarmSet bool
 }
 
-func (w *WX200) ReadTimeHumidity() error {
+func (w *WX200) readTimeHumidity() error {
 
 	now := time.Now()
 	_, err := w.readSample(w.bufTimeHumidity, header_time_humidity)

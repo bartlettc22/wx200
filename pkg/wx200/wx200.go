@@ -102,7 +102,7 @@ func (w *WX200) Go() {
 
 		switch headerByte[0] {
 		case header_time_humidity:
-			err = w.ReadTimeHumidity()
+			err = w.readTimeHumidity()
 		case header_temperature:
 			err = w.readTemperature()
 		case header_baro_dew:
@@ -113,7 +113,7 @@ func (w *WX200) Go() {
 			err = w.readWindGeneral()
 		default:
 			err = nil
-			// err = errors.New(fmt.Sprintf("Recieved unknown serial data header x%02x...", headerByte[0]))
+			// err = errors.New(fmt.Sprintf("Received unknown serial data header x%02x...", headerByte[0]))
 		}
 
 		if w.config.InfoDataChan != nil {
@@ -144,7 +144,7 @@ func (w *WX200) error(err error) {
 		if w.config.ErrorChan != nil {
 			w.config.ErrorChan <- err
 		} else {
-			log.Fatalf("Fatal error occured and error handling not set: %v", err)
+			log.Fatalf("Fatal error occurred and error handling not set: %v", err)
 		}
 	}
 }
