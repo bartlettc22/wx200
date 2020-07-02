@@ -16,6 +16,7 @@ const (
 	headerWindGeneral  = 0xcf
 )
 
+// Config contains configuration parameters for the WX200 library
 type Config struct {
 	ComPortName         string
 	TimeDataChan        chan Time
@@ -31,6 +32,7 @@ type Config struct {
 	ErrorChan           chan error
 }
 
+// WX200 is the main library class
 type WX200 struct {
 	config          *Config
 	comPort         io.ReadWriteCloser
@@ -43,6 +45,7 @@ type WX200 struct {
 	ChecksumErrors  int64
 }
 
+// New constructs a new WX200 based on the provided Config
 func New(config *Config) *WX200 {
 	return &WX200{
 		config:          config,
@@ -55,6 +58,9 @@ func New(config *Config) *WX200 {
 	}
 }
 
+// Go begins serial communication and reading of sample data
+// Is meant to be run as a goroutine and passes samples back
+// via any provided Config data channel values
 func (w *WX200) Go() {
 
 	var err error

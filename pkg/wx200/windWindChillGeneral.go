@@ -114,6 +114,7 @@ type Wind struct {
 	DisplayUnits uint8
 }
 
+// WindChill contains wind chill values, history and alarm information
 type WindChill struct {
 	// Wind chill (-85C to 60C)
 	Chill int8
