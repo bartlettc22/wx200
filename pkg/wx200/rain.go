@@ -59,7 +59,7 @@ func (w *WX200) readRain() error {
 	rain.Yesterday = uint16(combineDecimal(buf[4]))*100 + uint16(combineDecimal(buf[3]))
 	rain.Total = uint16(combineDecimal(buf[6]))*100 + uint16(combineDecimal(buf[5]))
 	rain.Reset = makeRecordDate(int(buf[10][1]), int(combineDecimal(buf[9])), int(combineDecimal(buf[8])), int(combineDecimal(buf[7])))
-	rain.DisplayUnits, err = SubDecimal(buf[10][0], 1, 1)
+	rain.DisplayUnits, err = subDecimal(buf[10][0], 1, 1)
 	w.error(err)
 	// Rainfall alarm data is in in/hr for some reason so we convert to mm/hr
 	rain.AlarmThreshold = uint16((float32(buf[12][1]*10) + float32(combineDecimal(buf[11]))/10) * float32(25.4))

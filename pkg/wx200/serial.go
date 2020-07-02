@@ -11,7 +11,6 @@ func readSerial(r io.ReadWriteCloser, buf []byte) error {
 	if err != nil {
 		return fmt.Errorf("Error reading %d bytes from serial: %v", len(buf), err)
 	}
-	// fmt.Printf("%d bytes read from serial\n", bytesRead)
 
 	return nil
 }

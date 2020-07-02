@@ -117,6 +117,7 @@ type Wind struct {
 
 // WindChill contains wind chill values, history and alarm information
 type WindChill struct {
+
 	// Wind chill (-85C to 60C)
 	Chill int8
 
@@ -146,11 +147,11 @@ func (w *WX200) readWindGeneral() error {
 	general.LastDataRecieved = now
 	general.PowerSourceDC = isBitSet(buf[23][0], 2)
 	general.LowPowerIndicator = isBitSet(buf[23][0], 3)
-	general.DisplaySelected, err = SubDecimal(buf[24][0], 0, 2)
+	general.DisplaySelected, err = subDecimal(buf[24][0], 0, 2)
 	w.error(err)
-	general.DisplaySubscreen, err = SubDecimal(buf[24][1], 0, 1)
+	general.DisplaySubscreen, err = subDecimal(buf[24][1], 0, 1)
 	w.error(err)
-	general.DisplayType, err = SubDecimal(buf[24][1], 2, 3)
+	general.DisplayType, err = subDecimal(buf[24][1], 2, 3)
 	w.error(err)
 	if w.config.GeneralDataChan != nil {
 		select {
@@ -175,7 +176,7 @@ func (w *WX200) readWindGeneral() error {
 	wind.HiDate = makeRecordDate(int(buf[13][1]), int(combineDecimal(buf[12])), int(combineDecimal(buf[11])), int(combineDecimal(buf[10])))
 	wind.AlarmThreshold = int8(buf[14][1])*10 + int8(buf[13][0])
 	wind.AlarmSet = isBitSet(buf[25][1], 2)
-	wind.DisplayUnits, err = SubDecimal(buf[15][0], 2, 3)
+	wind.DisplayUnits, err = subDecimal(buf[15][0], 2, 3)
 	w.error(err)
 	if w.config.WindDataChan != nil {
 		select {
@@ -198,7 +199,7 @@ func (w *WX200) readWindGeneral() error {
 	}
 	chill.ChillLo = int8(combineDecimal(buf[17])) * chillLoSign
 	chill.ChillLoDate = makeRecordDate(int(buf[21][1]), int(combineDecimal(buf[20])), int(combineDecimal(buf[19])), int(combineDecimal(buf[18])))
-	chillAlarmThresholdMultiplier, err := SubDecimal(buf[23][0], 0, 0)
+	chillAlarmThresholdMultiplier, err := subDecimal(buf[23][0], 0, 0)
 	w.error(err)
 	chillAlarmSign := int16(1)
 	if isBitSet(buf[23][1], 3) {

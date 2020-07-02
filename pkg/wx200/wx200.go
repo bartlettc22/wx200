@@ -19,16 +19,16 @@ const (
 // Config contains configuration parameters for the WX200 library
 type Config struct {
 	ComPortName         string
+	BarometerDataChan   chan Barometer
+	InfoDataChan        chan Info
 	TimeDataChan        chan Time
 	HumidityDataChan    chan Humidity
 	WindDataChan        chan Wind
-	GeneralDataChan     chan General
 	WindChillDataChan   chan WindChill
+	GeneralDataChan     chan General
 	RainDataChan        chan Rain
 	TemperatureDataChan chan Temperature
-	BarometerDataChan   chan Barometer
 	DewPointDataChan    chan DewPoint
-	InfoDataChan        chan Info
 	ErrorChan           chan error
 }
 
@@ -61,6 +61,11 @@ func New(config *Config) *WX200 {
 // Go begins serial communication and reading of sample data
 // Is meant to be run as a goroutine and passes samples back
 // via any provided Config data channel values
+// Time/Humidity is received every 10 seconds
+// Temperature is received every 10 seconds
+// Barometer/Dew Point is received every 10 seconds
+// Rain is received every 10 seconds
+// Wind/Wind Chill/General is received every 5 seconds
 func (w *WX200) Go() {
 
 	var err error
@@ -77,11 +82,6 @@ func (w *WX200) Go() {
 	headerByte := make([]byte, 1)
 
 	// main loop for reading serial data
-	// Time/Humidity 10 seconds
-	// Temperature 10 seconds
-	// Barometer/Dew Point 10 seconds
-	// Rain 10 seconds
-	// Wind/General 5 seconds
 	for {
 
 		// Connect to serial port if not already connected
@@ -117,8 +117,8 @@ func (w *WX200) Go() {
 		case headerWindGeneral:
 			err = w.readWindGeneral()
 		default:
+			// Seems to be some unknown data that comes through, just skip and move on...
 			err = nil
-			// err = errors.New(fmt.Sprintf("Received unknown serial data header x%02x...", headerByte[0]))
 		}
 
 		if w.config.InfoDataChan != nil {
@@ -136,7 +136,8 @@ func (w *WX200) Go() {
 
 // Ready returns true once samples have been read from all groups
 // Since there are 5 sample groups (4 every 10 seconds and 1 every 5)
-// We wait 2 sample cycles (up to 20 seconds)
+// We wait 2 sample cycles (up to 20 seconds) to make sure all samples are
+// read and the channels have enough time to process
 func (w *WX200) Ready() bool {
 	if w.info.SamplesRecieved >= 12 {
 		return true

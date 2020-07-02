@@ -30,6 +30,7 @@ const (
 
 // Barometer contains pressure values, history and alarm information
 type Barometer struct {
+
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
 
@@ -60,6 +61,7 @@ type Barometer struct {
 
 // DewPoint contains dew point values, history and alarm information
 type DewPoint struct {
+
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
 
@@ -128,9 +130,9 @@ func (w *WX200) readBaroDew() error {
 	baro.LastDataRecieved = now
 	baro.Local = uint16(combineDecimal(buf[2]))*100 + uint16(combineDecimal(buf[1]))
 	baro.SeaLevel = float32(buf[5][1])*1000 + float32(combineDecimal(buf[4]))*10 + float32(combineDecimal(buf[3]))/10
-	baro.DisplayUnits, err = SubDecimal(buf[5][0], 0, 1)
+	baro.DisplayUnits, err = subDecimal(buf[5][0], 0, 1)
 	w.error(err)
-	baro.Trend, err = SubDecimal(buf[6][0], 0, 2)
+	baro.Trend, err = subDecimal(buf[6][0], 0, 2)
 	w.error(err)
 	baro.Prediction = uint8(buf[6][1])
 	// Threshold comes out indexed at 0 so we have to add one

@@ -120,9 +120,9 @@ func (w *WX200) readTimeHumidity() error {
 	t.LastDataRecieved = now
 	// Since there is no "year", we assume it's the current year
 	t.Date = time.Date(now.Year(), time.Month(buf[5][1]), int(combineDecimal(buf[4])), int(combineDecimal(buf[3])), int(combineDecimal(buf[2])), int(combineDecimal(buf[1])), 0, time.UTC)
-	t.HourFormat, err = SubDecimal(buf[5][0], 0, 0)
+	t.HourFormat, err = subDecimal(buf[5][0], 0, 0)
 	w.error(err)
-	t.DateFormat, err = SubDecimal(buf[5][0], 1, 1)
+	t.DateFormat, err = subDecimal(buf[5][0], 1, 1)
 	w.error(err)
 	// For the alarm, we set the date as the next date the alarm will fire since only hour/minute are available on the device
 	t.Alarm = time.Date(t.Date.Year(), t.Date.Month(), t.Date.Day(), int(combineDecimal(buf[7])), int(combineDecimal(buf[6])), 0, 0, time.UTC)
