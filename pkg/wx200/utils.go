@@ -7,10 +7,10 @@ import (
 )
 
 // Gets a 2-digit combined decimal value 0-99
-func getCombinedDecimal(b byte) uint8 {
-	b1, b2 := splitByte(b)
-	return combineDecimal([2]byte{b1, b2})
-}
+// func getCombinedDecimal(b byte) uint8 {
+// 	b1, b2 := splitByte(b)
+// 	return combineDecimal([2]byte{b1, b2})
+// }
 
 func combineDecimal(b [2]byte) uint8 {
 	return uint8(b[0]*10 + b[1])
@@ -81,34 +81,34 @@ func makeRecordDate(month int, day int, hour int, minute int) time.Time {
 // validateChecksum validates that the data was passed over the serial line correctly
 // This is done by adding up each byte of the group (including the group header) and
 // comparing it to the checksum byte
-func validateChecksum(headerByte byte, data []byte) bool {
+// func validateChecksum(headerByte byte, data []byte) bool {
 
-	// The expected checksum byte comes in as the last byte of data
-	expectedChecksum := data[len(data)-1]
-	// if headerByte == byte(HEADER_RAIN) {
-	// 	fmt.Printf("Expected: hex:%02x int:%d\n", expectedChecksum, uint(expectedChecksum))
-	// 	fmt.Printf("Adding %d bytes\n", uint(headerByte))
-	// }
+// 	// The expected checksum byte comes in as the last byte of data
+// 	expectedChecksum := data[len(data)-1]
+// 	// if headerByte == byte(HEADER_RAIN) {
+// 	// 	fmt.Printf("Expected: hex:%02x int:%d\n", expectedChecksum, uint(expectedChecksum))
+// 	// 	fmt.Printf("Adding %d bytes\n", uint(headerByte))
+// 	// }
 
-	// Add up the header + data (skipping the checksum byte)
-	checkSum := uint(headerByte)
-	// i := 1
-	for _, val := range data[:len(data)-1] {
-		checkSum = checkSum + uint(val)
-		// i = i + 1
-		// if headerByte == byte(HEADER_RAIN) {
-		// 	fmt.Printf("Adding %d bytes, new total: %d\n", uint(val), checkSum)
-		// }
-	}
-	// if headerByte == byte(HEADER_RAIN) {
-	// 	fmt.Printf("Actual: int:%d hex:%02x uint8:%d\n", checkSum, checkSum, uint8(checkSum))
-	// 	fmt.Printf("Checked %d bytes\n", i)
-	// 	fmt.Println()
+// 	// Add up the header + data (skipping the checksum byte)
+// 	checkSum := uint(headerByte)
+// 	// i := 1
+// 	for _, val := range data[:len(data)-1] {
+// 		checkSum = checkSum + uint(val)
+// 		// i = i + 1
+// 		// if headerByte == byte(HEADER_RAIN) {
+// 		// 	fmt.Printf("Adding %d bytes, new total: %d\n", uint(val), checkSum)
+// 		// }
+// 	}
+// 	// if headerByte == byte(HEADER_RAIN) {
+// 	// 	fmt.Printf("Actual: int:%d hex:%02x uint8:%d\n", checkSum, checkSum, uint8(checkSum))
+// 	// 	fmt.Printf("Checked %d bytes\n", i)
+// 	// 	fmt.Println()
 
-	// }
-	return int8(checkSum) == int8(expectedChecksum)
+// 	// }
+// 	return int8(checkSum) == int8(expectedChecksum)
 
-}
+// }
 
 // Split into 4-bit chunks
 // Pads output by adding zeros to first byte pair and shifts indexes up by 1

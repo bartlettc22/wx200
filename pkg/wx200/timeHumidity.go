@@ -1,9 +1,20 @@
 package wx200
 
 import (
-	// "errors"
-	// "github.com/davecgh/go-spew/spew"
+	"fmt"
 	"time"
+)
+
+// Time display hour format
+const (
+	DISPLAY_HOUR_FORMAT_12 = iota
+	DISPLAY_HOUR_FORMAT_24
+)
+
+// Time display date format
+const (
+	DISPLAY_DATE_FORMAT_DM = iota
+	DISPLAY_DATE_FORMAT_MD
 )
 
 // Time holds time values, formats and alarm data
@@ -12,16 +23,22 @@ type Time struct {
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
 
-	Second       uint8
-	Minute       uint8
-	Hour         uint8
-	Day          uint8
-	HourFormat24 bool // Is time in 24-hour format
-	DateFormatMD bool // Is date in month-day format (day-month, if false)
-	Month        uint8
-	AlarmMinute  uint8
-	AlarmHour    uint8
-	AlarmSet     bool
+	// Date/Time set on the WX200 device
+	Date time.Time
+
+	// Format of hour
+	// 12hr=0 24hr=1
+	HourFormat uint8
+
+	// Format of date
+	// day-month=0 month-day=1
+	DateFormat uint8
+
+	// Alarm time (the d/m/y part represent the next time the alarm will go off)
+	Alarm time.Time
+
+	// Alarm is set
+	AlarmSet bool
 }
 
 // Humidity holds humidity values, records and alarm data
@@ -30,13 +47,13 @@ type Humidity struct {
 	// LastDataRecieved contains the time the last data was received
 	LastDataRecieved time.Time
 
-	// Current indoor humidity (%)
+	// Current indoor humidity (10% to 97%)
 	Indoor uint8
 
 	// Current indoor humidity out of range
 	IndoorOR bool
 
-	// Record high for indoor humidity (%)
+	// Record high for indoor humidity (10% to 97%)
 	IndoorHi uint8
 
 	// Record high for indoor humidity out of range
@@ -45,28 +62,28 @@ type Humidity struct {
 	// Date of record high for indoor humidity
 	IndoorHiDate time.Time
 
-	// Threshold for alarm for high indoor humidity (%)
-	IndoorAlarmHi uint8
+	// Threshold for alarm for high indoor humidity (10% to 97%)
+	IndoorHiAlarm uint8
 
-	// Record low for indoor humidity (%)
+	// Record low for indoor humidity (10% to 97%)
 	IndoorLo uint8
 
 	// Date of record low for indoor humidity
 	IndoorLoDate time.Time
 
-	// Threshold for alerm for low indoor humidity (%)
-	IndoorAlarmLo uint8
+	// Threshold for alerm for low indoor humidity (10% to 97%)
+	IndoorLoAlarm uint8
 
 	// Alarm for indoor humidity is set
 	IndoorAlarmSet bool
 
-	// Current outdoor humidity (%)
+	// Current outdoor humidity (10% to 97%)
 	Outdoor uint8
 
 	// Current outdoor humidity out of range
 	OutdoorOR bool
 
-	// Record high for outdoor humidity (%)
+	// Record high for outdoor humidity (10% to 97%)
 	OutdoorHi uint8
 
 	// Record high for outdoor humidity out of range
@@ -75,17 +92,17 @@ type Humidity struct {
 	// Date of record high for outdoor humidity
 	OutdoorHiDate time.Time
 
-	// Threshold for alarm for high outdoor humidity (%)
-	OutdoorAlarmHi uint8
+	// Threshold for alarm for high outdoor humidity 10% to 97%)
+	OutdoorHiAlarm uint8
 
-	// Record low for outdoor humidity (%)
+	// Record low for outdoor humidity (10% to 97%)
 	OutdoorLo uint8
 
 	// Date of record low for outdoor humidity
 	OutdoorLoDate time.Time
 
-	// Threshold for alerm for low outdoor humidity (%)
-	OutdoorAlarmLo uint8
+	// Threshold for alerm for low outdoor humidity (10% to 97%)
+	OutdoorLoAlarm uint8
 
 	// Alarm for outdoor humidity is set
 	OutdoorAlarmSet bool
@@ -94,99 +111,63 @@ type Humidity struct {
 func (w *WX200) readTimeHumidity() error {
 
 	now := time.Now()
-	_, err := w.readSample(w.bufTimeHumidity, headerTimeHumidity)
+	buf, err := w.readSample(w.bufTimeHumidity, headerTimeHumidity)
 	if err != nil {
 		return err
 	}
-	// err := readSerial(w.comPort, w.bufTimeHumidity)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// // Validate checksum
-	// checksumValid := validateChecksum(HEADER_TIME_HUMIDITY, w.bufTimeHumidity)
-	// if !checksumValid {
-	// 	return errors.New("Checksum failed on group 'Time/Humidity'")
-	// }
 
 	t := Time{}
 	t.LastDataRecieved = now
-	t.Second = getCombinedDecimal(w.bufTimeHumidity[0])
-	t.Minute = getCombinedDecimal(w.bufTimeHumidity[1])
-	t.Hour = getCombinedDecimal(w.bufTimeHumidity[2])
-	t.Day = getCombinedDecimal(w.bufTimeHumidity[3])
-	s1, s2 := splitByte(w.bufTimeHumidity[4])
-	t.HourFormat24 = isBitSet(s1, 0)
-	t.DateFormatMD = isBitSet(s1, 1)
-	t.Month = uint8(s2)
-	t.AlarmMinute = getCombinedDecimal(w.bufTimeHumidity[5])
-	t.AlarmHour = getCombinedDecimal(w.bufTimeHumidity[6])
-
-	var (
-		indoorHiMonth  byte
-		indoorLoMonth  byte
-		indoorLo       [2]byte
-		indoorHiMinute uint8
-		indoorLoMinute [2]byte
-		indoorHiHour   uint8
-		indoorLoHour   [2]byte
-		indoorHiDay    uint8
-		indoorLoDay    [2]byte
-	)
-	indoorHiMinute = getCombinedDecimal(w.bufTimeHumidity[9])
-	indoorHiHour = getCombinedDecimal(w.bufTimeHumidity[10])
-	indoorHiDay = getCombinedDecimal(w.bufTimeHumidity[11])
-	indoorLo[1], indoorHiMonth = splitByte(w.bufTimeHumidity[12])
-	indoorLoMinute[1], indoorLo[0] = splitByte(w.bufTimeHumidity[13])
-	indoorLoHour[1], indoorLoMinute[0] = splitByte(w.bufTimeHumidity[14])
-	indoorLoDay[1], indoorLoHour[0] = splitByte(w.bufTimeHumidity[15])
-	indoorLoMonth, indoorLoDay[0] = splitByte(w.bufTimeHumidity[16])
-	x, y := splitByte(w.bufTimeHumidity[31])
-	x1, y1 := splitByte(w.bufTimeHumidity[32])
+	// Since there is no "year", we assume it's the current year
+	t.Date = time.Date(now.Year(), time.Month(buf[5][1]), int(combineDecimal(buf[4])), int(combineDecimal(buf[3])), int(combineDecimal(buf[2])), int(combineDecimal(buf[1])), 0, time.UTC)
+	t.HourFormat, err = SubDecimal(buf[5][0], 0, 0)
+	w.error(err)
+	t.DateFormat, err = SubDecimal(buf[5][0], 1, 1)
+	w.error(err)
+	// For the alarm, we set the date as the next date the alarm will fire since only hour/minute are available on the device
+	t.Alarm = time.Date(t.Date.Year(), t.Date.Month(), t.Date.Day(), int(combineDecimal(buf[7])), int(combineDecimal(buf[6])), 0, 0, time.UTC)
+	if t.Date.After(t.Alarm) {
+		// Alarm already passed today, add a day
+		t.Alarm = t.Alarm.Add(24 * time.Hour)
+	}
+	t.AlarmSet = isBitSet(buf[33][1], 3)
+	if w.config.TimeDataChan != nil {
+		select {
+		case w.config.TimeDataChan <- t:
+		default:
+			return fmt.Errorf("Time data cannot be sent to channel (might be full). Skipping sample.")
+		}
+	}
 
 	h := Humidity{}
 	h.LastDataRecieved = now
-	h.Indoor = getCombinedDecimal(w.bufTimeHumidity[7])
-	h.IndoorOR = isBitSet(x, 3)
-	h.IndoorHi = getCombinedDecimal(w.bufTimeHumidity[8])
-	h.IndoorHiOR = isBitSet(x, 2)
-	h.IndoorLo = combineDecimal(indoorLo)
-	h.IndoorLoDate = makeRecordDate(int(indoorLoMonth), int(combineDecimal(indoorLoDay)), int(combineDecimal(indoorLoHour)), int(combineDecimal(indoorLoMinute)))
-	h.IndoorHiDate = makeRecordDate(int(indoorHiMonth), int(indoorHiDay), int(indoorHiHour), int(indoorHiMinute))
-	h.IndoorAlarmHi = getCombinedDecimal(w.bufTimeHumidity[17])
-	h.IndoorAlarmLo = getCombinedDecimal(w.bufTimeHumidity[18])
-	h.IndoorAlarmSet = isBitSet(x1, 2) && isBitSet(x1, 3)
-	h.Outdoor = getCombinedDecimal(w.bufTimeHumidity[19])
-	h.OutdoorHi = getCombinedDecimal(w.bufTimeHumidity[20])
-	h.OutdoorOR = isBitSet(x, 0)
-	h.OutdoorHiOR = isBitSet(y, 3)
-	outdoorHiMinute := getCombinedDecimal(w.bufTimeHumidity[21])
-	outdoorHiHour := getCombinedDecimal(w.bufTimeHumidity[22])
-	outdoorHiDay := getCombinedDecimal(w.bufTimeHumidity[23])
-	ho0, outdoorHiMonth := splitByte(w.bufTimeHumidity[24])
-	ho1, ho2 := splitByte(w.bufTimeHumidity[25])
-	ho3, ho4 := splitByte(w.bufTimeHumidity[26])
-	ho5, ho6 := splitByte(w.bufTimeHumidity[27])
-	outdoorLoMonth, ho7 := splitByte(w.bufTimeHumidity[28])
-	h.OutdoorLo = combineDecimal([2]byte{ho2, ho0})
-	outdoorLoMinute := combineDecimal([2]byte{ho4, ho1})
-	outdoorLoHour := combineDecimal([2]byte{ho6, ho3})
-	outdoorLoDay := combineDecimal([2]byte{ho7, ho5})
-	h.OutdoorLoDate = makeRecordDate(int(outdoorLoMonth), int(outdoorLoDay), int(outdoorLoHour), int(outdoorLoMinute))
+	h.Indoor = combineDecimal(buf[8])
+	h.IndoorOR = isBitSet(buf[32][0], 3)
+	h.IndoorHi = combineDecimal(buf[9])
+	h.IndoorHiOR = isBitSet(buf[32][0], 2)
+	h.IndoorHiDate = makeRecordDate(int(buf[13][1]), int(combineDecimal(buf[12])), int(combineDecimal(buf[11])), int(combineDecimal(buf[10])))
+	h.IndoorHiAlarm = combineDecimal(buf[18])
+	h.IndoorLo = combineDecimal([2]byte{buf[14][1], buf[13][0]})
+	h.IndoorLoDate = makeRecordDate(int(buf[17][0]), int(combineDecimal([2]byte{buf[17][1], buf[16][0]})), int(combineDecimal([2]byte{buf[16][1], buf[15][0]})), int(combineDecimal([2]byte{buf[15][1], buf[14][0]})))
+	h.IndoorLoAlarm = combineDecimal(buf[19])
+	h.IndoorAlarmSet = isBitSet(buf[33][0], 2) && isBitSet(buf[33][0], 3)
+	h.Outdoor = combineDecimal(buf[20])
+	h.OutdoorHi = combineDecimal(buf[21])
+	h.OutdoorOR = isBitSet(buf[32][0], 0)
+	h.OutdoorHiOR = isBitSet(buf[32][1], 3)
+	h.OutdoorHiDate = makeRecordDate(int(buf[25][1]), int(combineDecimal(buf[24])), int(combineDecimal(buf[23])), int(combineDecimal(buf[22])))
+	h.OutdoorHiAlarm = combineDecimal(buf[30])
+	h.OutdoorLo = combineDecimal([2]byte{buf[26][1], buf[25][0]})
+	h.OutdoorLoDate = makeRecordDate(int(buf[17][0]), int(combineDecimal([2]byte{buf[29][1], buf[28][0]})), int(combineDecimal([2]byte{buf[28][1], buf[27][0]})), int(int(combineDecimal([2]byte{buf[27][1], buf[26][0]}))))
+	h.OutdoorLoAlarm = combineDecimal(buf[31])
+	h.OutdoorAlarmSet = isBitSet(buf[33][0], 0) && isBitSet(buf[33][0], 1)
 
-	h.OutdoorHiDate = makeRecordDate(int(outdoorHiMonth), int(outdoorHiDay), int(outdoorHiHour), int(outdoorHiMinute))
-	h.OutdoorAlarmHi = getCombinedDecimal(w.bufTimeHumidity[29])
-	h.OutdoorAlarmLo = getCombinedDecimal(w.bufTimeHumidity[30])
-	h.OutdoorAlarmSet = isBitSet(x1, 0) && isBitSet(x1, 1)
-
-	t.AlarmSet = isBitSet(y1, 3)
-
-	// Push our values to their respective data channels
-	if w.config.TimeDataChan != nil {
-		w.config.TimeDataChan <- t
-	}
 	if w.config.HumidityDataChan != nil {
-		w.config.HumidityDataChan <- h
+		select {
+		case w.config.HumidityDataChan <- h:
+		default:
+			return fmt.Errorf("Humidity data cannot be sent to channel (might be full). Skipping sample.")
+		}
 	}
 
 	return nil

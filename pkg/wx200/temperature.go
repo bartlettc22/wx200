@@ -1,6 +1,7 @@
 package wx200
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -20,6 +21,13 @@ func (w *WX200) readTemperature() error {
 
 	temp := Temperature{}
 	temp.LastDataRecieved = now
+	if w.config.TemperatureDataChan != nil {
+		select {
+		case w.config.TemperatureDataChan <- temp:
+		default:
+			return fmt.Errorf("Temperature data cannot be sent to channel (might be full). Skipping sample.")
+		}
+	}
 
 	return nil
 }

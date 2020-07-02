@@ -1,35 +1,9 @@
 package wx200
 
 import (
+	"fmt"
 	"time"
 )
-
-// General contains general WX200 display information
-type General struct {
-
-	// LastDataRecieved contains the time the last data was received
-	LastDataRecieved time.Time
-
-	// PowerSourceDC
-	// DCPower=true , ACPower=false
-	PowerSourceDC bool
-
-	// LowPowerIndicator
-	// On=true , Off=false
-	LowPowerIndicator bool
-
-	// DisplaySelected indicates the display screen that is selected
-	// Time=0, Temp=1, ... Rain=7
-	DisplaySelected uint8
-
-	// DisplaySubscreen indicates the display subscreen that is selected
-	// First=0, Second=1, Third=2, Fourth=3
-	DisplaySubscreen uint8
-
-	// DisplayType indicates the display screen type that is selected
-	// Main=0, Mem=1, AlarmIn=2, AlarmOut=3
-	DisplayType uint8
-}
 
 // General display selection enumerations
 const (
@@ -66,6 +40,33 @@ const (
 	WIND_UNITS_MS
 	WIND_UNITS_KPH
 )
+
+// General contains general WX200 display information
+type General struct {
+
+	// LastDataRecieved contains the time the last data was received
+	LastDataRecieved time.Time
+
+	// PowerSourceDC
+	// DCPower=true , ACPower=false
+	PowerSourceDC bool
+
+	// LowPowerIndicator
+	// On=true , Off=false
+	LowPowerIndicator bool
+
+	// DisplaySelected indicates the display screen that is selected
+	// Time=0, Temp=1, ... Rain=7
+	DisplaySelected uint8
+
+	// DisplaySubscreen indicates the display subscreen that is selected
+	// First=0, Second=1, Third=2, Fourth=3
+	DisplaySubscreen uint8
+
+	// DisplayType indicates the display screen type that is selected
+	// Main=0, Mem=1, AlarmIn=2, AlarmOut=3
+	DisplayType uint8
+}
 
 // Wind contains wind speed/direction values, history and alarm information
 type Wind struct {
@@ -134,7 +135,6 @@ type WindChill struct {
 
 func (w *WX200) readWindGeneral() error {
 
-	// now := time.Now()
 	now := time.Now()
 	buf, err := w.readSample(w.bufWindGeneral, headerWindGeneral)
 	if err != nil {
@@ -153,7 +153,11 @@ func (w *WX200) readWindGeneral() error {
 	general.DisplayType, err = SubDecimal(buf[24][1], 2, 3)
 	w.error(err)
 	if w.config.GeneralDataChan != nil {
-		w.config.GeneralDataChan <- general
+		select {
+		case w.config.GeneralDataChan <- general:
+		default:
+			return fmt.Errorf("General data cannot be sent to channel (might be full). Skipping sample.")
+		}
 	}
 
 	// Wind
@@ -174,7 +178,11 @@ func (w *WX200) readWindGeneral() error {
 	wind.DisplayUnits, err = SubDecimal(buf[15][0], 2, 3)
 	w.error(err)
 	if w.config.WindDataChan != nil {
-		w.config.WindDataChan <- wind
+		select {
+		case w.config.WindDataChan <- wind:
+		default:
+			return fmt.Errorf("Wind data cannot be sent to channel (might be full). Skipping sample.")
+		}
 	}
 
 	// Wind Chill
@@ -200,8 +208,16 @@ func (w *WX200) readWindGeneral() error {
 	chillAlarmF := (int16(chillAlarmThresholdMultiplier)*100 + int16(combineDecimal(buf[22]))) * chillAlarmSign
 	chill.ChillAlarmThreshold = int16(float32(chillAlarmF-32.0) * (float32(5) / float32(9)))
 	chill.ChillAlarmSet = isBitSet(buf[25][1], 1)
+
 	if w.config.WindChillDataChan != nil {
 		w.config.WindChillDataChan <- chill
+	}
+	if w.config.WindChillDataChan != nil {
+		select {
+		case w.config.WindChillDataChan <- chill:
+		default:
+			return fmt.Errorf("Wind chill data cannot be sent to channel (might be full). Skipping sample.")
+		}
 	}
 
 	return nil

@@ -12,9 +12,7 @@ import (
 	"time"
 )
 
-// Application version - passed in via build
 var version = "default"
-
 var wx *wx200.WX200
 var errorChan chan error
 var windDataChan chan wx200.Wind
@@ -45,6 +43,7 @@ func main() {
 	humidityDataChan = make(chan wx200.Humidity, 1)
 	barometerDataChan = make(chan wx200.Barometer, 1)
 	dewPointDataChan = make(chan wx200.DewPoint, 1)
+	rainDataChan = make(chan wx200.Rain, 1)
 	infoDataChan = make(chan wx200.Info, 1)
 	errorChan = make(chan error)
 
@@ -67,6 +66,7 @@ func main() {
 	go collectHumidityMetrics()
 	go collectBarometerMetrics()
 	go collectDewPointMetrics()
+	go collectRainMetrics()
 	go collectInfoMetrics()
 
 	// Start serial communication
@@ -137,7 +137,7 @@ func collectRainMetrics() {
 func collectBarometerMetrics() {
 	for b := range barometerDataChan {
 		log.WithFields(log.Fields{
-			"rain": fmt.Sprintf("%+v", b),
+			"barometer": fmt.Sprintf("%+v", b),
 		}).Debug("Barometer data received")
 		// spew.Dump(r)
 		// metricGustSpeed.With(prometheus.Labels{}).Set(w.GustSpeed)

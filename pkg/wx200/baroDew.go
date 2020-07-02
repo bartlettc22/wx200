@@ -1,7 +1,7 @@
 package wx200
 
 import (
-	"github.com/davecgh/go-spew/spew"
+	"fmt"
 	"time"
 )
 
@@ -137,7 +137,11 @@ func (w *WX200) readBaroDew() error {
 	baro.AlarmThreshold = uint8(buf[29][1]) + 1
 	baro.AlarmSet = isBitSet(buf[29][0], 3)
 	if w.config.BarometerDataChan != nil {
-		w.config.BarometerDataChan <- baro
+		select {
+		case w.config.BarometerDataChan <- baro:
+		default:
+			return fmt.Errorf("Barometer data cannot be sent to channel (might be full). Skipping sample.")
+		}
 	}
 
 	// Dew Point
@@ -159,7 +163,6 @@ func (w *WX200) readBaroDew() error {
 	// serial proto mapping doc has error - I believe what is below is correct
 	dew.OutdoorOR = isBitSet(buf[28][1], 2)
 	dew.OutdoorHi = combineDecimal(buf[19])
-	spew.Dump(buf[28])
 	dew.OutdoorHiDate = makeRecordDate(int(buf[23][1]), int(combineDecimal(buf[22])), int(combineDecimal(buf[21])), int(combineDecimal(buf[20])))
 	dew.OutdoorLo = combineDecimal([2]byte{buf[24][1], buf[23][0]})
 	// serial proto mapping doc has error - I believe what is below is correct
@@ -167,10 +170,13 @@ func (w *WX200) readBaroDew() error {
 	dew.OutdoorLoDate = makeRecordDate(int(buf[27][0]), int(combineDecimal([2]byte{buf[27][1], buf[26][0]})), int(combineDecimal([2]byte{buf[26][1], buf[25][0]})), int(combineDecimal([2]byte{buf[25][1], buf[24][0]})))
 	// Threshold comes out indexed at 0 so we have to add one
 	dew.OutdoorAlarmThreshold = uint8(buf[17][0]) + 1
-
 	dew.AlarmSet = isBitSet(buf[29][0], 1) && isBitSet(buf[29][0], 2)
 	if w.config.DewPointDataChan != nil {
-		w.config.DewPointDataChan <- dew
+		select {
+		case w.config.DewPointDataChan <- dew:
+		default:
+			return fmt.Errorf("Dew Point data cannot be sent to channel (might be full). Skipping sample.")
+		}
 	}
 
 	return nil
