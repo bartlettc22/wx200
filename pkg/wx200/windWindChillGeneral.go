@@ -7,7 +7,7 @@ import (
 
 // General display selection enumerations
 const (
-	DISPLAY_SELECTED_TIME = iota
+	DISPLAY_SELECTED_CLOCK uint8 = iota
 	DISPLAY_SELECTED_TEMP
 	DISPLAY_SELECTED_HUMIDITY
 	DISPLAY_SELECTED_DEW
@@ -35,7 +35,7 @@ const (
 
 // Wind units enumerations
 const (
-	WIND_UNITS_MPH = iota
+	WIND_UNITS_MPH uint8 = iota
 	WIND_UNITS_KNOTS
 	WIND_UNITS_MS
 	WIND_UNITS_KPH
@@ -209,10 +209,6 @@ func (w *WX200) readWindGeneral() error {
 	chillAlarmF := (int16(chillAlarmThresholdMultiplier)*100 + int16(combineDecimal(buf[22]))) * chillAlarmSign
 	chill.ChillAlarmThreshold = int16(float32(chillAlarmF-32.0) * (float32(5) / float32(9)))
 	chill.ChillAlarmSet = isBitSet(buf[25][1], 1)
-
-	if w.config.WindChillDataChan != nil {
-		w.config.WindChillDataChan <- chill
-	}
 	if w.config.WindChillDataChan != nil {
 		select {
 		case w.config.WindChillDataChan <- chill:

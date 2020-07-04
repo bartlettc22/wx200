@@ -2,6 +2,7 @@ package wx200
 
 import (
 	"errors"
+	"math"
 	"time"
 )
 
@@ -77,4 +78,9 @@ func chopBuffer(buf []byte) [][2]byte {
 	}
 
 	return out
+}
+
+// tempFToC takes a temperature in F and converts it to C
+func tempFToC(f int16) int8 {
+	return int8(math.Round(float64(f-32.0) * (float64(5) / float64(9))))
 }

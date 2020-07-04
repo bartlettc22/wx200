@@ -139,10 +139,11 @@ func (w *WX200) Go() {
 // We wait 2 sample cycles (up to 20 seconds) to make sure all samples are
 // read and the channels have enough time to process
 func (w *WX200) Ready() bool {
-	if w.info.SamplesRecieved >= 12 {
-		return true
-	}
-	return false
+	// if w.info.SamplesRecieved >= 12 {
+	// 	return true
+	// }
+	// return false
+	return true
 }
 
 func (w *WX200) error(err error) {
