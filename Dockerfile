@@ -1,8 +1,8 @@
 FROM golang:1.14 as builder
 
-ARG VERSION=default
-ARG GOOS=linux
-ARG GOARCH=amd64
+ARG VERSION=
+ARG GOOS=
+ARG GOARCH=
 
 WORKDIR /go/src/github.com/bartlettc22/wx200/
 COPY ./ .
