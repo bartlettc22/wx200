@@ -16,12 +16,18 @@ fi
 mkdir -p bin
 
 # Build the container
-docker build \
-    --build-arg VERSION=${VERSION} \
-    --build-arg GOOS=${OS} \
-    --build-arg GOARCH=${ARCH} \
-    -t ${DOCKER_REPO}:${VERSION}-${OS}-${ARCH} \
-    ./
+# docker build \
+#     --build-arg VERSION=${VERSION} \
+#     --build-arg GOOS=${OS} \
+#     --build-arg GOARCH=${ARCH} \
+#     -t ${DOCKER_REPO}:${VERSION}-${OS}-${ARCH} \
+#     ./
+docker buildx -h
+docker buildx build \
+     --progress plain \
+    --platform=linux/amd64,linux/arm64 \
+    -t ${DOCKER_REPO}:${VERSION} \
+    .
 
 # Extract the binary from the container
 docker run \

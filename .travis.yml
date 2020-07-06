@@ -1,24 +1,24 @@
-# dist: xenial
-# sudo: required
-arch:
-  - amd64
-  - arm64
-os: linux
-language: minimal
-services:
-  - docker
-# before_install:
-#   - curl -fsSL https://get.docker.com | sh
-#   - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
-#   - mkdir -p $HOME/.docker
-#   - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
-#   - sudo service docker start
-# install:
-#   - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-#   - docker buildx create --name xbuilder --use
+dist: xenial
+sudo: required
+# arch:
+#   - amd64
+#   - arm64
+# os: linux
+# language: minimal
+# services:
+#   - docker
+before_install:
+  - curl -fsSL https://get.docker.com | sh
+  - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
+  - mkdir -p $HOME/.docker
+  - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
+  - sudo service docker start
+install:
+  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  - docker buildx create --name xbuilder --use
 script:
-  - scripts/build.sh ${TRAVIS_BRANCH} linux ${TRAVIS_CPU_ARCH}
-  - scripts/build.sh ${TRAVIS_BRANCH} windows ${TRAVIS_CPU_ARCH}
+  - scripts/build.sh ${TRAVIS_BRANCH} linux
+  # - scripts/build.sh ${TRAVIS_BRANCH} windows
 deploy:
 - provider: releases
   api_key:
