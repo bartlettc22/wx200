@@ -3,12 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/bartlettc22/wx200/pkg/wx200"
-	// "github.com/davecgh/go-spew/spew"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -24,20 +22,17 @@ var dewPointDataChan chan wx200.DewPoint
 var infoDataChan chan wx200.Info
 var generalDataChan chan wx200.General
 var temperatureDataChan chan wx200.Temperature
-
-func init() {
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.WarnLevel)
-}
+var listenPort string
+var comPortName string
+var v string
 
 func main() {
+	rootCmd.Execute()
+}
 
-	log.SetLevel(log.InfoLevel)
+func run() {
+	// log.SetLevel(log.InfoLevel)
 	log.Infof("Starting WX200 exporter v%s", version)
-
-	// CMD VARS
-	listenPort := 9041
-	comPortName := "/dev/ttyUSB0"
 
 	// initialize our channels
 	windDataChan = make(chan wx200.Wind, 1)
@@ -90,9 +85,9 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}
 
-	log.Infof("Listening on port %d\n", listenPort)
+	log.Infof("Listening on port %s\n", listenPort)
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(fmt.Sprintf(":%d", listenPort), nil)
+	http.ListenAndServe(fmt.Sprintf(":%s", listenPort), nil)
 }
 
 func collectHumidityMetrics() {
