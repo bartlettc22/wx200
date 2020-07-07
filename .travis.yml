@@ -1,17 +1,17 @@
 # dist: xenial
-# sudo: required
-arch:
+sudo: required
+# arch:
 #   - amd64
-  - arm64
+  # - arm64
 os: linux
 language: minimal
 services:
   - docker
 before_install:
   # - curl -fsSL https://get.docker.com | sh
-  - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
-  # - mkdir -p $HOME/.docker
-  # - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
+  - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+  - mkdir -p $HOME/.docker
+  - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
   - sudo service docker restart
 # install:
 # Enables execution of different multi-architecture containers by QEMU and binfmt_misc
