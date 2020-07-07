@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -eo pipefail
+set -o xtrace
 
 VERSION=${1:-master}
 OS=${2:-linux}
@@ -8,8 +9,8 @@ ARCH=${3:-amd64}
 DOCKER_REPO="bartlettc/wx200"
 
 
-docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-docker buildx create --name xbuilder --use
+# docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+# docker buildx create --name xbuilder --use
 # Don't build an ARM Windows binary
 # if [[ "${OS}" == "windows" && "${ARCH}" == "arm" ]]; then
 #     exit 0
@@ -25,7 +26,7 @@ mkdir -p bin
 #     --build-arg GOARCH=${ARCH} \
 #     -t ${DOCKER_REPO}:${VERSION}-${OS}-${ARCH} \
 #     ./
-docker buildx build --output=type=local,dest=./bin/test --platform=linux/arm64 -t test .    
+docker buildx build --output=type=local,dest=./bin/test --platform=linux/arm64 -t test .
 # docker buildx -h
 # docker buildx build \
 #      --progress plain \
@@ -35,6 +36,8 @@ docker buildx build --output=type=local,dest=./bin/test --platform=linux/arm64 -
 
 docker image ls -a
 ls -al ./bin/test
+
+docker run test
 # docker manifest create bartlettc/wx200:test \
 # --amend bartlettc/wx200:test-amd64 \
 # --amend bartlettc/wx200:test-arm
