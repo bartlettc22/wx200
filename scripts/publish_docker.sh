@@ -13,6 +13,7 @@ docker push ${DOCKER_REPO}:${PUBLISH_VERSION}-${ARCH}
 
 # On arm build (last build), publish the final combined image
 if [[ "${ARCH}" == "arm" ]]; then
+# Wait for amd64 image to finish
     docker manifest create \
     ${DOCKER_REPO}:${PUBLISH_VERSION} \
     --amend ${DOCKER_REPO}:${PUBLISH_VERSION}-amd64 \
