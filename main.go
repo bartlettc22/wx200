@@ -144,8 +144,8 @@ func collectDewPointMetrics() {
 		log.WithFields(log.Fields{
 			"dewpoint": fmt.Sprintf("%+v", d),
 		}).Debug("Dew Point data received")
-		metricDewPoint.With(prometheus.Labels{"location": "inside"}).Set(float64(d.Indoor))
-		metricDewPoint.With(prometheus.Labels{"location": "outside"}).Set(float64(d.Outdoor))
+		metricDewPoint.With(prometheus.Labels{"location": "indoor"}).Set(float64(d.Indoor))
+		metricDewPoint.With(prometheus.Labels{"location": "outdoor"}).Set(float64(d.Outdoor))
 	}
 }
 
@@ -161,8 +161,8 @@ func collectTemperatureMetrics() {
 		log.WithFields(log.Fields{
 			"temperature": fmt.Sprintf("%+v", m),
 		}).Debug("Temperature data received")
-		metricTemperature.With(prometheus.Labels{"location": "inside"}).Set(float64(m.Indoor))
-		metricTemperature.With(prometheus.Labels{"location": "outside"}).Set(float64(m.Outdoor))
+		metricTemperature.With(prometheus.Labels{"location": "indoor"}).Set(float64(m.Indoor))
+		metricTemperature.With(prometheus.Labels{"location": "outdoor"}).Set(float64(m.Outdoor))
 	}
 }
 

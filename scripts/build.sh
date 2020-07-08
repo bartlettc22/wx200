@@ -26,7 +26,7 @@ mkdir -p bin
 #     --build-arg GOARCH=${ARCH} \
 #     -t ${DOCKER_REPO}:${VERSION}-${OS}-${ARCH} \
 #     ./
-docker buildx build --output=type=local,dest=./bin/test --platform=linux/arm64 -t test .
+docker buildx build --progress plain --output=type=local,dest=./bin/test --platform=linux/arm64 -t test .
 # docker buildx -h
 # docker buildx build \
 #      --progress plain \
