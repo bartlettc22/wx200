@@ -26,7 +26,7 @@ mkdir -p bin
 #     --build-arg GOARCH=${ARCH} \
 #     -t ${DOCKER_REPO}:${VERSION}-${OS}-${ARCH} \
 #     ./
-docker buildx build --progress plain --output=type=local,dest=./bin/test --platform=linux/arm64 -t test .
+docker buildx build --platform=linux/amd64,linux/arm64 -t bartlettc/wx200:latest --push . # --progress plain
 # docker buildx -h
 # docker buildx build \
 #      --progress plain \
@@ -37,7 +37,7 @@ docker buildx build --progress plain --output=type=local,dest=./bin/test --platf
 docker image ls -a
 ls -al ./bin/test
 
-docker run test
+#docker run test
 # docker manifest create bartlettc/wx200:test \
 # --amend bartlettc/wx200:test-amd64 \
 # --amend bartlettc/wx200:test-arm
