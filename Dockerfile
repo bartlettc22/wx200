@@ -8,7 +8,7 @@ ARG GOOS=
 WORKDIR /go/src/github.com/bartlettc22/wx200/
 COPY ./ .
 
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -mod vendor -ldflags "-s -w -X github.com/bartlettc22/wx200/main.Version=${VERSION}" -v -a -o bin/wx200 .
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -mod vendor -ldflags "-s -w -X main.version=${VERSION}" -v -a -o bin/wx200 .
 
 FROM alpine:3.12
 

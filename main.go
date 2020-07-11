@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var version = "default"
+var version string
 var wx *wx200.WX200
 var errorChan chan error
 var windDataChan chan wx200.Wind
