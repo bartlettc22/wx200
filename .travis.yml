@@ -21,10 +21,7 @@ jobs:
     script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64 true
   - stage: build-tag
     if: tag IS present
-    script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64,linux/arm,windows/amd64,darwin/amd64
-      true
-  - stage: deploy
-    if: tag IS present
+    script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64,linux/arm,linux/arm64,windows/amd64,darwin/amd64
     deploy:
     - provider: releases
       api_key:
@@ -34,6 +31,8 @@ jobs:
       - bin/*.tar.gz
       - bin/*.zip
       skip_cleanup: true
+      on:
+        tags: true
 env:
   global:
   - secure: RDfkg1NiekMOUwXkmBFPBpBMnYzN5LcWPY7A/S3SyKKeMV9jLjJgKFmNiwZF98HN6cPHzPY/RhFgFZffIddTG0aPz1dTnMmGxoYLlYlCtKaijj6QmeQ3Txezi37hRsBIfJoqTX+iCTZiz0urO2jjS0oHpQsj1i+XpVLJd+Vfw3XM6/Am2O0TfmeTL74BIGCQowzkL4cIRkNFXWoskeyuEY0rtkIdX1NtkaNyyi9843LG+XVdQ+48n0krcEBAvXjw76WywbqCilJlvpiw4MLRH3OJmvI41zPMX8/LDuh+B7hi+Y30dZOIL+tk7SQRUJ3UFftEMyHYLl9mDgbfKIBOM8lu7/LnxjHP4vilQ5ImDKl7pSiO2mGZURIGFpnPCbVt5TiADwkuSfqYYH1Sif4qwiqLPSB5WyhQ4B4biCkrkLhI5YLGKlUxULvn5EVokIskVE98ygBtxLxxOKQEtxw2F6L75SPlKWfVwwoSLQOHu+Rdm7oB5arUA5EMMY0fgfS+dxxpNgBBsuuJo3BPE/wk57uBf9xeIwhWrVcl+O1xA0m5EgSQuyJ1BYwFyyjjBYZTtxUhA82WD6XJoaifUzkxHXvBineKul4Phxl0eaORgxI5QBNHaNcdEVHGNfvnD7waBimQnuPlbW9pNHL0BvRpieUtqL3YmzuMrBK4SVX33NM=

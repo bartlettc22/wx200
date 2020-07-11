@@ -24,8 +24,13 @@ function archive {
     cd -
 }
 
+# This just tests if we're already logged in and logs in using env vars if not
 if [ "${PUBLISH}" == "true" ]; then
-    echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+    EXIT_CODE=0
+    printf 'foo' | docker login > /dev/null 2>&1 || EXIT_CODE=$?
+    if [ ${EXIT_CODE} -ne 0 ]; then
+        echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+    fi
 fi
 
 # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
