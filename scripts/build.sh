@@ -25,7 +25,7 @@ function archive {
     cd -
 }
 
-if [ "$PUBLISH" == "true" ]; then
+if [ "${PUBLISH}" == "true" ]; then
     echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
 fi
 
@@ -51,7 +51,7 @@ if [ ${#LINUX_PLATFORMS[@]} > 0 ]; then
 
     # Build and push linux multiarch images
     PUSH=""
-    if "{PUBLISH}" == "true" ]; then
+    if "${PUBLISH}" == "true" ]; then
       PUSH="--push"
     fi
     docker buildx build \
@@ -63,7 +63,7 @@ if [ ${#LINUX_PLATFORMS[@]} > 0 ]; then
         .
 
     # Extract the binaries from the containers
-    if "{PUBLISH}" == "true" ]; then 
+    if "${PUBLISH}" == "true" ]; then 
         for PLATFORM in ${LINUX_PLATFORMS[@]}
         do
             OS=${PLATFORM%/*}
@@ -100,7 +100,7 @@ if [ ${#OTHER_PLATFORMS[@]} > 0 ]; then
         -t ${DOCKER_REPO}:build-${OS}-${ARCH} \
         .
 
-        if "{PUBLISH}" == "true" ]; then 
+        if "${PUBLISH}" == "true" ]; then 
 
             # Run the container to extract the binary
             docker run \
