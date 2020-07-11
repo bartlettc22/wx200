@@ -25,8 +25,12 @@ The following arguments are available
 
 The exporter can also be run in Docker like so
 ```
-docker run -d --rm -p 9041:9041 bartlettc/wx200 -c /dev/ttyUSB0 -p 9041
+docker run -d -p 9041:9041 --privileged bartlettc/wx200:v0.1.0 -c /dev/ttyUSB0
 ```
+
+The following [Grafana](https://grafana.com/) dashboard utilizing the Prometheus data can be imported from [grafana-dashboard.json](grafana-dashboard.json)
+
+![WX200 Grafana Dashboard](grafana-dashboard.png)
 
 ## Using the WX200 library
 Basic example of using the WX200 golang library
