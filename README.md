@@ -10,7 +10,7 @@ This project contains the following:
 This project could not have been completed without the work of Mike Wingstrom, Glynne Tolar and Tim Witham at [wx200.planetfall.com](http://wx200.planetfall.com/).  Their [serial protocol mapping](http://wx200.planetfall.com/wx200.txt) (also located [here](docs/wx200_serial_protocol.txt)) was invaluable to parsing out the data in a timely manner.
 
 ## Using the Prometheus exporter
-To use the Prometheus exporter, simply download the binary and run it
+To use the Prometheus exporter, simply download the latest binary from the [releases page](https://github.com/bartlettc22/wx200/releases/latest) and run it
 ```
 ./wx200
 ```
@@ -42,18 +42,18 @@ import github.com/bartlettc22/wx200/pkg/wx200
 
     // Temperature data will be pushed to this channel
     temperatureDataChan := make(chan wx200.Temperature, 1)
-	wx = wx200.New(&wx200.Config{
-		ComPortName:         "/dev/ttyUSB0",
-		TemperatureDataChan: temperatureDataChan,
-	})
+    wx = wx200.New(&wx200.Config{
+        ComPortName:         "/dev/ttyUSB0",
+        TemperatureDataChan: temperatureDataChan,
+    })
 
     // Starts async reading of serial data from the WX200
     go wx.Go()
 
     // Process incoming data
-	for d := range temperatureDataChan {
+    for d := range temperatureDataChan {
         fmt.Printf("Indoor Temp: %d, Outdoor Temp: %d\n", d.Indoor, d.Outdoor)
-	}
+    }
 
 ...
 ```
