@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -eu -o pipefail
 
 VERSION=${1:-master}
 PLATFORMS=${2:-"linux/amd64"}
@@ -83,7 +83,7 @@ if [ ${#LINUX_PLATFORMS[@]} > 0 ]; then
     fi
 fi
 
-if [ ${#OTHER_PLATFORMS[@]} > 0 ]; then
+if [[ ${#OTHER_PLATFORMS[@]} -gt 0 ]]; then
 
     
     for PLATFORM in $(echo ${OTHER_PLATFORMS[@]} | sed "s/,/ /g")
