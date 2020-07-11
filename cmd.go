@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&listenPort, "listen-port", "p", "9041", "Metrics server listener port")
 	rootCmd.PersistentFlags().StringVarP(&comPortName, "com-port", "c", "/dev/ttyUSB0", "Com port that the WX200 is attached")
-	rootCmd.PersistentFlags().StringVarP(&v, "verbosity", "v", log.WarnLevel.String(), "Log level (debug, info, warn")
+	rootCmd.PersistentFlags().StringVarP(&v, "verbosity", "v", log.InfoLevel.String(), "Log level (debug, info, warn")
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if err := setUpLogs(os.Stdout, v); err != nil {
 			return err
