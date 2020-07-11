@@ -16,12 +16,9 @@ jobs:
   - stage: build-branch
     if: branch != master && tag IS blank
     script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64 false
-  - stage: build-master
-    if: branch = master
-    script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64 true
   - stage: build-tag
-    if: tag IS present
-    script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64,linux/arm,linux/arm64,windows/amd64,darwin/amd64
+    if: tag IS present || branch = master
+    script: scripts/build.sh ${TRAVIS_BRANCH} linux/amd64,linux/arm,linux/arm64,windows/amd64,darwin/amd64 true
     deploy:
     - provider: releases
       api_key:

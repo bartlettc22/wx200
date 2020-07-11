@@ -51,7 +51,7 @@ mkdir -p bin
 rm -rf bin/*
 
 # Build and extract binaries
-if [ ${#LINUX_PLATFORMS[@]} > 0 ]; then
+if [[ ${#LINUX_PLATFORMS[@]} > 0 ]]; then
 
     # Build and push linux multiarch images
     PUSH=""
