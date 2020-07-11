@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
-# set -o xtrace
+set -euxo pipefail
 
 VERSION=${1:-master}
 PLATFORMS=${2:-"linux/amd64"}
